@@ -1,14 +1,14 @@
 {
   "redirects": [
     {
-      "source": "/",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "midmut.com"
         }
       ],
-      "destination": "https://www.midmut.com",
+      "destination": "https://www.midmut.com/:1",
       "statusCode": 308
     }
   ]
