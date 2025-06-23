@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "midmut.com"
+        }
+      ],
+      "destination": "https://www.midmut.com/$1",
+      "permanent": true
+    }
+  ]
+}
