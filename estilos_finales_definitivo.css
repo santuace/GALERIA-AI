@@ -215,4 +215,23 @@ footer {
 .modal-info-content p {
   margin: 5px 0;
   font-size: 0.95em;
+}/* ————— Layout para el modal de imagen ————— */
+#imageModal .modal-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;       /* espacio entre imagen y tarjeta */
+  padding: 24px;   /* separa contenido de bordes del modal */
+}
+
+/* Que la tarjeta no se achique demasiado */
+#imageModal .modal-info-card {
+  flex-shrink: 0;
+  max-width: 360px;
+}
+
+/* (Opcional) Ajusta altura si hace scroll dentro del modal */
+#imageModal .modal-content-wrapper {
+  max-height: 90vh;
+  overflow-y: auto;
 }
