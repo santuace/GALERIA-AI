@@ -198,4 +198,21 @@ footer {
 }
 @media (max-width: 480px) {
     .galeria { column-count: 1; }
+/* ------------------- */
+/* Estilos para el bloque de info en el modal */
+.modal-info {
+  margin-top: 20px;
+  padding: 20px;
+  color: #fff;
+  text-align: left;
+}
+
+.modal-info-content h3 {
+  margin: 0 0 10px;
+  color: #f1f1f1;
+}
+
+.modal-info-content p {
+  margin: 5px 0;
+  font-size: 0.95em;
 }

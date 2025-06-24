@@ -28,7 +28,8 @@
 <div id="imageModal" class="modal">
     <span class="close-button">&times;</span>
     <div class="modal-content-wrapper">
-        <div id="modalMediaContainer"></div>
+	<div id="modalMediaContainer"></div>
+        <div id="modalInfoContainer" class="modal-info"></div>
     </div>
 </div>
 
@@ -48,102 +49,122 @@
         </div>
     </div>
 </div>
-
 <script src="gallery_data_restaurado.js"></script> 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const imageModal = document.getElementById('imageModal');
-    const aboutMeModal = document.getElementById('aboutMeModal');
+    const imageModal          = document.getElementById('imageModal');
+    const aboutMeModal        = document.getElementById('aboutMeModal');
     const modalMediaContainer = document.getElementById('modalMediaContainer');
-    const closeImageButton = document.querySelector('#imageModal .close-button'); 
-    const openAboutMeButton = document.getElementById('openAboutMe');
-    const closeAboutMeButton = document.querySelector('#aboutMeModal .close-button');
+    const modalInfoContainer  = document.getElementById('modalInfoContainer');
+    const closeImageButton    = document.querySelector('#imageModal .close-button');
+    const openAboutMeButton   = document.getElementById('openAboutMe');
+    const closeAboutMeButton  = document.querySelector('#aboutMeModal .close-button');
 
-    if (imageModal) imageModal.style.display = 'none';
+    // Ocultamos modals al iniciar
+    if (imageModal)   imageModal.style.display   = 'none';
     if (aboutMeModal) aboutMeModal.style.display = 'none';
 
+    // Renderizamos galería
     const gallery = document.querySelector('.galeria');
     galleryImages.forEach((image) => {
         let mediaTag;
         if (image.type === "video") {
-            mediaTag = `<video src="imagenes/${image.filename}" muted autoplay loop playsinline ${image.poster ? 'poster="imagenes/' + image.poster + '"' : ''}></video>`;
+            mediaTag = `
+              <video
+                src="imagenes/${image.filename}"
+                muted autoplay loop playsinline
+                ${image.poster ? `poster="imagenes/${image.poster}"` : ''}>
+              </video>`;
         } else {
             mediaTag = `<img src="imagenes/${image.filename}" alt="${image.title}">`;
         }
 
         const imageHtml = `
-            <div class="imagen-item" 
-                 data-type="${image.type}" 
-                 data-filename="${image.filename}" 
-                 data-title="${image.title}" 
-                 data-prompt="${image.prompt}" 
-                 ${image.poster ? 'data-poster="'+image.poster+'"' : ''}>
-                    ${mediaTag}
-            </div>`;
+          <div class="imagen-item"
+               data-type="${image.type}"
+               data-filename="${image.filename}"
+               data-title="${image.title}"
+               data-prompt="${image.prompt}"
+               data-model="${image.model || ''}"
+               ${image.poster ? `data-poster="${image.poster}"` : ''}>
+            ${mediaTag}
+          </div>`;
         gallery.insertAdjacentHTML('beforeend', imageHtml);
     });
 
+    // Abrir modal al clickear cada ítem
     const galleryItems = document.querySelectorAll('.imagen-item');
-
     galleryItems.forEach(item => {
         item.addEventListener('click', function() {
-            const type = this.dataset.type;
+            const type     = this.dataset.type;
             const filename = this.dataset.filename;
-            const title = this.dataset.title;
-            const prompt = this.dataset.prompt;
-            const poster = this.dataset.poster;
+            const title    = this.dataset.title;
+            const prompt   = this.dataset.prompt;
+            const model    = this.dataset.model;
+            const poster   = this.dataset.poster;
 
+            // Limpiamos contenedores del modal
             modalMediaContainer.innerHTML = '';
+            modalInfoContainer.innerHTML  = '';
 
+            // Insertamos media
             if (type === "video") {
                 const videoElement = document.createElement('video');
-                videoElement.src = `imagenes/${filename}`;
-                videoElement.controls = true;
-                videoElement.autoplay = true;
-                videoElement.loop = true;
-                videoElement.muted = false;
-                videoElement.playsinline = true;
+                videoElement.src        = `imagenes/${filename}`;
+                videoElement.controls   = true;
+                videoElement.autoplay   = true;
+                videoElement.loop       = true;
+                videoElement.muted      = false;
+                videoElement.playsinline= true;
                 videoElement.classList.add('modal-content');
                 if (poster) videoElement.poster = `imagenes/${poster}`;
                 modalMediaContainer.appendChild(videoElement);
             } else {
                 const imgElement = document.createElement('img');
-                imgElement.src = `imagenes/${filename}`;
-                imgElement.alt = title;
+                imgElement.src   = `imagenes/${filename}`;
+                imgElement.alt   = title;
                 imgElement.classList.add('modal-content');
                 modalMediaContainer.appendChild(imgElement);
             }
 
+            // — Aquí rellenamos título, prompt y modelo —
+            modalInfoContainer.innerHTML = `
+              <div class="modal-info-content">
+                <h3>${title}</h3>
+                <p><strong>Prompt:</strong> ${prompt}</p>
+                <p><strong>Modelo:</strong> ${model}</p>
+              </div>`;
+
+            // Mostramos el modal
             imageModal.style.display = "flex";
         });
     });
 
+    // Cerrar modal imagen
     closeImageButton.addEventListener('click', function() {
         imageModal.style.display = "none";
         const currentVideo = modalMediaContainer.querySelector('video');
         if (currentVideo) currentVideo.pause();
     });
-
-    imageModal.addEventListener('click', function(event) {
-        if (event.target === imageModal) {
+    imageModal.addEventListener('click', function(e) {
+        if (e.target === imageModal) {
             imageModal.style.display = "none";
             const currentVideo = modalMediaContainer.querySelector('video');
             if (currentVideo) currentVideo.pause();
         }
     });
 
-    openAboutMeButton.addEventListener('click', function(event) {
-        event.preventDefault(); 
+    // Abrir/Cerrar modal “Sobre mí”
+    openAboutMeButton.addEventListener('click', function(e) {
+        e.preventDefault();
         aboutMeModal.style.display = "flex";
     });
-
     closeAboutMeButton.addEventListener('click', function() {
         aboutMeModal.style.display = "none";
     });
-
-    aboutMeModal.addEventListener('click', function(event) {
-        if (event.target === aboutMeModal) {
-            aboutMeModal.style.display = "none"; 
+    aboutMeModal.addEventListener('click', function(e) {
+        if (e.target === aboutMeModal) {
+            aboutMeModal.style.display = "none";
         }
     });
 });
