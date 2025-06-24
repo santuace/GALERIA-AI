@@ -1,12 +1,10 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   const gallery = document.getElementById("gallery");
 
-  fetch("gallery_data_restaurado.js")
-    .then(response => response.text())
+  fetch("gallery_data.json")
+    .then(response => response.json())
     .then(data => {
-      eval(data); // evalúa la variable galleryData declarada en el .js
-      renderGallery(galleryData);
+      renderGallery(data);
     });
 
   function renderGallery(items) {
