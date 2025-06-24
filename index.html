@@ -128,12 +128,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // — Aquí rellenamos título, prompt y modelo —
-            modalInfoContainer.innerHTML = `
-              <div class="modal-info-content">
-                <h3>${title}</h3>
-                <p><strong>Prompt:</strong> ${prompt}</p>
-                <p><strong>Modelo:</strong> ${model}</p>
-              </div>`;
+           // — Aquí rellenamos la “info card” estilo referencia —
+modalInfoContainer.innerHTML = `
+  <div class="modal-info-card">
+    <div class="info-header">
+      <svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm.75 15h-1.5v-1.5h1.5V17zm0-3h-1.5V7h1.5v7z"/>
+      </svg>
+      <h4>Prompt</h4>
+    </div>
+    <div class="info-body">
+      <p class="info-prompt">${prompt}</p>
+      <div class="info-row"><span>Modelo</span><span>${model}</span></div>
+      <div class="info-row"><span>Archivo</span><span>${filename}</span></div>
+    </div>
+  </div>`;
+
 
             // Mostramos el modal
             imageModal.style.display = "flex";
