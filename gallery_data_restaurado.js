@@ -1,5 +1,3 @@
-@ -0,0 +1,96 @@
-
 const galleryImages = [
     {
         filename: "video1.mp4",
