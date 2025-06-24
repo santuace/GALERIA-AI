@@ -198,40 +198,40 @@ footer {
 }
 @media (max-width: 480px) {
     .galeria { column-count: 1; }
+}
+
 /* ------------------- */
 /* Estilos para el bloque de info en el modal */
 .modal-info {
-  margin-top: 20px;
-  padding: 20px;
-  color: #fff;
-  text-align: left;
+    margin-top: 20px;
+    padding: 20px;
+    color: #fff;
+    text-align: left;
 }
 
 .modal-info-content h3 {
-  margin: 0 0 10px;
-  color: #f1f1f1;
+    margin: 0 0 10px;
+    color: #f1f1f1;
 }
 
 .modal-info-content p {
-  margin: 5px 0;
-  font-size: 0.95em;
-}/* ————— Layout para el modal de imagen ————— */
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+/* ————— Layout para el modal de imagen ————— */
 #imageModal .modal-content-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 32px;       /* espacio entre imagen y tarjeta */
-  padding: 24px;   /* separa contenido de bordes del modal */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 32px;
+    padding: 24px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 /* Que la tarjeta no se achique demasiado */
 #imageModal .modal-info-card {
-  flex-shrink: 0;
-  max-width: 360px;
-}
-
-/* (Opcional) Ajusta altura si hace scroll dentro del modal */
-#imageModal .modal-content-wrapper {
-  max-height: 90vh;
-  overflow-y: auto;
+    flex-shrink: 0;
+    max-width: 360px;
 }
