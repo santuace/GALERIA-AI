@@ -54,6 +54,7 @@ footer { text-align: center; padding: 20px; font-size: 0.85em; color: #777; }
     overflow-y: auto;
     padding: 40px 0;
     box-sizing: border-box;
+    z-index: 10000; /* sobre nav */
 }
 
 /* Wrapper for image and info card */
@@ -61,19 +62,21 @@ footer { text-align: center; padding: 20px; font-size: 0.85em; color: #777; }
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 24px;
+    gap: 16px;        /* reducido para menor distancia */
     padding: 24px;
     background: #fff;
-    border-radius: 16px;
+    border-radius: 0; /* esquinas rectas */
     box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     max-height: 90vh;
     overflow-y: auto;
+    position: relative;
+    z-index: 10001;   /* sobre nav */
 }
 
 /* Image/video styling */
-n#modalMediaContainer .modal-content {
+#modalMediaContainer .modal-content {
     width: auto;
     height: auto;
     max-width: 50vw;
@@ -95,7 +98,6 @@ n#modalMediaContainer .modal-content {
     font-size: 0.95em;
     color: #333;
     flex-shrink: 0;
-    margin-top: 16px;
 }
 .modal-info-card .info-header {
     display: flex;
@@ -133,8 +135,13 @@ n#modalMediaContainer .modal-content {
 .modal-info-card .info-row span:first-child { font-weight: 500; color: #666; }
 .modal-info-card .info-row span:last-child { color: #333; }
 
-/* About me modal */
-#aboutMeModal .modal-content-wrapper { display: flex; justify-content: center; align-items: center; padding: 0; }
+/* About me modal styling */
+#aboutMeModal .modal-content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
 .about-modal-content-wrapper {
     background: #fff;
     padding: 30px;
@@ -162,7 +169,7 @@ n#modalMediaContainer .modal-content {
     z-index: 10;
 }
 
-/* Responsive */
+/* Responsive gallery columns */
 @media (max-width: 1400px) { .galeria { column-count: 4; } }
 @media (max-width: 1024px) { .galeria { column-count: 3; } }
 @media (max-width: 768px) { .galeria { column-count: 2; } }
