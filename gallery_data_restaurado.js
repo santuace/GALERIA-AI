@@ -1,6 +1,20 @@
 const galleryData = [
-  { type: "image", url: "imagenes/imagen1.png" },
-  { type: "image", url: "imagenes/imagen2.png" },
-  { type: "video", url: "imagenes/video1.mp4" },
-  { type: "video", url: "imagenes/video2.mp4" }
+  { type: "image", src: "imagenes/imagen1.png" },
+  { type: "image", src: "imagenes/imagen2.png" },
+  { type: "image", src: "imagenes/imagen3.png" },
+  { type: "image", src: "imagenes/imagen4.png" },
+  { type: "image", src: "imagenes/imagen5.png" },
+  { type: "image", src: "imagenes/imagen6.png" },
+  { type: "image", src: "imagenes/imagen7.png" },
+  { type: "image", src: "imagenes/imagen8.png" },
+  { type: "image", src: "imagenes/imagen9.png" },
+  { type: "image", src: "imagenes/imagen10.png" },
+  { type: "image", src: "imagenes/imagen11.png" },
+  { type: "image", src: "imagenes/imagen12.png" },
+  { type: "image", src: "imagenes/imagen13.png" },
+  { type: "image", src: "imagenes/imagen14.png" },
+  { type: "image", src: "imagenes/imagen15.png" },
+  { type: "image", src: "imagenes/imagen16.png" },
+  { type: "image", src: "imagenes/imagen17.png" },
+  { type: "image", src: "imagenes/imagen18.png" }
 ];
