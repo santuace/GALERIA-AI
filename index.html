@@ -1,3 +1,4 @@
+@ -0,0 +1,153 @@
 
 <!DOCTYPE html>
 <html lang="es">
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (aboutMeModal) aboutMeModal.style.display = 'none';
 
     const gallery = document.querySelector('.galeria');
- galleryData.forEach((image) => {
+    galleryImages.forEach((image) => {
         let mediaTag;
         if (image.type === "video") {
             mediaTag = `<video src="imagenes/${image.filename}" muted autoplay loop playsinline ${image.poster ? 'poster="imagenes/' + image.poster + '"' : ''}></video>`;

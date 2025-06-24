@@ -1,20 +1,97 @@
-const galleryData = [
-  { type: "image", src: "imagenes/imagen1.png" },
-  { type: "image", src: "imagenes/imagen2.png" },
-  { type: "image", src: "imagenes/imagen3.png" },
-  { type: "image", src: "imagenes/imagen4.png" },
-  { type: "image", src: "imagenes/imagen5.png" },
-  { type: "image", src: "imagenes/imagen6.png" },
-  { type: "image", src: "imagenes/imagen7.png" },
-  { type: "image", src: "imagenes/imagen8.png" },
-  { type: "image", src: "imagenes/imagen9.png" },
-  { type: "image", src: "imagenes/imagen10.png" },
-  { type: "image", src: "imagenes/imagen11.png" },
-  { type: "image", src: "imagenes/imagen12.png" },
-  { type: "image", src: "imagenes/imagen13.png" },
-  { type: "image", src: "imagenes/imagen14.png" },
-  { type: "image", src: "imagenes/imagen15.png" },
-  { type: "image", src: "imagenes/imagen16.png" },
-  { type: "image", src: "imagenes/imagen17.png" },
-  { type: "image", src: "imagenes/imagen18.png" }
+@ -0,0 +1,96 @@
+
+const galleryImages = [
+    {
+        filename: "video1.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video2.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video4.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video5.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video6.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video7.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video8.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video9.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video10.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+  {
+        filename: "video11.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+ {
+        filename: "video12.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+ {
+        filename: "video13.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+ {
+        filename: "video14.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
+ {
+        filename: "video15.mp4",
+        type: "video",
+        title: "Animación IA",
+        prompt: "Video generado por IA."
+    }, 
 ];
+
+for (let i = 168; i >= 1; i--) {
+    galleryImages.push({
+        filename: `imagen${i}.png`,
+        type: "image",
+        title: `Creación AI #${i}`,
+        prompt: `Prompt: Detalles de la creación AI número ${i}.`
+    });
+}
