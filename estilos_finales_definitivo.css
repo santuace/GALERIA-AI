@@ -10,50 +10,27 @@ html, body {
     overflow-x: hidden;
 }
 
+/* Navbar */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
+    background-color: #fff;
     padding: 15px 40px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
+.navbar-left .logo { height: 40px; }
+.navbar-right { display: flex; gap: 25px; }
+.nav-link { text-decoration: none; color: #4a4a4a; font-weight: 500; font-size: 1em; transition: color 0.3s; }
+.nav-link:hover { color: #3f51b5; }
 
-.navbar-left .logo {
-    height: 40px;
-    width: auto;
-    object-fit: contain;
-}
+/* Footer */
+footer { text-align: center; padding: 20px; font-size: 0.85em; color: #777; }
 
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.nav-link {
-    text-decoration: none;
-    color: #4a4a4a;
-    font-weight: 400;
-    font-size: 1.05em;
-    transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-    color: #3f51b5;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 0.9em;
-    color: #777;
-}
-
-/* Galería en columnas tipo masonry */
+/* Masonry gallery */
 .galeria {
     column-count: 5;
     column-gap: 8px;
@@ -61,210 +38,123 @@ footer {
     max-width: 1500px;
     margin: 0 auto;
 }
-
-.imagen-item {
-    background-color: white;
-    overflow: hidden;
-    margin-bottom: 8px;
-    break-inside: avoid;
-    cursor: pointer;
-}
-
+.imagen-item { margin-bottom: 8px; break-inside: avoid; cursor: pointer; background: #fff; }
 .imagen-item img,
-.imagen-item video {
-    width: 100%;
-    height: auto;
-    display: block;
-}
+.imagen-item video { width: 100%; height: auto; display: block; }
 
-/* Modal completo */
+/* Modal container */
 .modal {
     display: none;
     position: fixed;
-    z-index: 9999;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.8);
-    display: flex;
-    align-items: center;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    align-items: flex-start;
     justify-content: center;
-}
-
-/* Estilo exclusivo para las imágenes/vídeos en el modal */
-#imageModal .modal-content {
-    max-width: 90vw;
-    max-height: 90vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    border: 1px solid #ccc;
-}
-
-/* Wrapper para contenido del modal “Sobre mí” */
-#aboutMeModal .modal-content-wrapper {
-    max-height: 90vh;
     overflow-y: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 40px 0;
+    box-sizing: border-box;
 }
 
-/* Diseño del contenido de "Sobre mí" */
-.about-modal-content-wrapper {
-    background-color: white;
-    padding: 30px;
-    border-radius: 0;
-    max-width: 800px;
-    width: 90%;
+/* Image/video in modal */
+#modalMediaContainer .modal-content {
+    background: #fff;
+    display: block;
+    max-width: 60vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Adjusted wrapper for image + info */
+#imageModal .modal-content-wrapper {
     display: flex;
     flex-direction: row;
-    gap: 30px;
     align-items: flex-start;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    gap: 24px;
+    padding: 0;
+    background: none;
 }
 
-.about-photo-container {
-    flex: 1 1 300px;
-    max-width: 350px;
-}
-
-.about-photo {
-    width: 100%;
-    border-radius: 0;
-    display: block;
-}
-
-.about-text-content {
-    flex: 2 1 500px;
-}
-
-.about-text-content h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-    color: #111;
-}
-
-.about-text-content p {
-    font-size: 1em;
-    line-height: 1.5;
-    color: #333;
-    margin-bottom: 1em;
-}
-
-.close-button {
-    position: absolute;
-    top: 20px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: #bbb;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Responsive columns */
-@media (max-width: 1400px) {
-    .galeria { column-count: 4; }
-}
-@media (max-width: 1024px) {
-    .galeria { column-count: 3; }
-}
-@media (max-width: 768px) {
-    .galeria { column-count: 2; }
-    .about-modal-content-wrapper {
-        flex-direction: column;
-        padding: 20px;
-    }
-    .about-photo-container,
-    .about-text-content {
-        max-width: 100%;
-        flex: 1 1 100%;
-    }
-}
-@media (max-width: 480px) {
-    .galeria { column-count: 1; }
-} /* ← aquí cierra bien ese media */
-
-/* ------------------- */
-/* Estilos para la “info card” en el modal de imagen */
+/* Info card styling */
 .modal-info-card {
-    background: #f9f9f9;
-    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
     padding: 24px;
-    max-width: 360px;
+    width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 0.95em;
     color: #333;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
-
 .modal-info-card .info-header {
     display: flex;
     align-items: center;
     margin-bottom: 16px;
 }
-
 .modal-info-card .info-icon {
     width: 20px;
     height: 20px;
     fill: #e94e1b;
     margin-right: 8px;
 }
-
 .modal-info-card h4 {
     margin: 0;
     font-size: 1.1em;
-    font-weight: 500;
+    font-weight: 600;
+    color: #222;
 }
-
 .modal-info-card .info-body {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
-
 .modal-info-card .info-prompt {
     margin: 0;
     line-height: 1.5;
-    font-size: 0.95em;
     color: #444;
 }
-
 .modal-info-card .info-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9em;
+    padding-top: 12px;
     border-top: 1px solid #ddd;
-    padding-top: 8px;
 }
+.modal-info-card .info-row span:first-child { font-weight: 500; color: #666; }
+.modal-info-card .info-row span:last-child { color: #333; }
 
-.modal-info-card .info-row span:first-child {
-    font-weight: 500;
-}
-
-/* ————— Layout para el modal de imagen (imagen + info card lado a lado) ————— */
-#imageModal .modal-content-wrapper {
+/* About me modal */
+#aboutMeModal .modal-content-wrapper { display: flex; justify-content: center; align-items: center; padding: 0; }
+.about-modal-content-wrapper {
+    background: #fff;
+    padding: 30px;
+    max-width: 800px;
+    width: 90%;
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 32px;       /* espacio entre imagen y tarjeta */
-    padding: 24px;   /* separa contenido de bordes del modal */
-    max-height: 90vh;
-    overflow-y: auto;
+    gap: 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+.about-photo-container { flex: 1 1 300px; max-width: 350px; }
+.about-photo { width: 100%; display: block; border-radius: 8px; }
+.about-text-content { flex: 2 1 500px; }
+.about-text-content h2 { margin-top: 0; font-size: 2em; color: #111; }
+.about-text-content p { color: #333; line-height: 1.5; margin-bottom: 1em; }
+
+/* Close button */
+.close-button {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    font-size: 32px;
+    color: #fff;
+    cursor: pointer;
+    z-index: 10;
 }
 
-/* Impide que la tarjeta se achique demasiado */
-#imageModal .modal-info-card {
-    flex-shrink: 0;
-}
+/* Responsive */
+@media (max-width: 1400px) { .galeria { column-count: 4; } }
+@media (max-width: 1024px) { .galeria { column-count: 3; } }
+@media (max-width: 768px) { .galeria { column-count: 2; } }
+@media (max-width: 480px) { .galeria { column-count: 1; } }

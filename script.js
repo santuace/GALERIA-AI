@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
@@ -57,7 +58,7 @@ async function main() {
     }
   }
 
-  const csv = 'Imagen,Descripción + Prompt\n' + results.map(r => `${r[0]}","\${r[1].replace(/"/g, '""')}"`).join('\n');
+  const csv = 'Imagen,Descripción + Prompt\n' + results.map(r => `"\${r[0]}","\${r[1].replace(/"/g, '""')}"`).join('\n');
   fs.writeFileSync(outputFile, csv);
   console.log(`✅ Archivo generado: \${outputFile}`);
 }
