@@ -92,7 +92,7 @@ footer {
     justify-content: center;
 }
 
-/* Estilo exclusivo para imágenes en el modal */
+/* Estilo exclusivo para las imágenes/vídeos en el modal */
 #imageModal .modal-content {
     max-width: 90vw;
     max-height: 90vh;
@@ -125,10 +125,8 @@ footer {
     display: flex;
     flex-direction: row;
     gap: 30px;
-    align-items: center;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-    flex-wrap: nowrap;
     align-items: flex-start;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .about-photo-container {
@@ -190,48 +188,83 @@ footer {
         flex-direction: column;
         padding: 20px;
     }
-
-    .about-photo-container, .about-text-content {
+    .about-photo-container,
+    .about-text-content {
         max-width: 100%;
         flex: 1 1 100%;
     }
 }
 @media (max-width: 480px) {
     .galeria { column-count: 1; }
-}
+} /* ← aquí cierra bien ese media */
 
 /* ------------------- */
-/* Estilos para el bloque de info en el modal */
-.modal-info {
-    margin-top: 20px;
-    padding: 20px;
-    color: #fff;
-    text-align: left;
+/* Estilos para la “info card” en el modal de imagen */
+.modal-info-card {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 360px;
+    color: #333;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
 }
 
-.modal-info-content h3 {
-    margin: 0 0 10px;
-    color: #f1f1f1;
+.modal-info-card .info-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.modal-info-content p {
-    margin: 5px 0;
+.modal-info-card .info-icon {
+    width: 20px;
+    height: 20px;
+    fill: #e94e1b;
+    margin-right: 8px;
+}
+
+.modal-info-card h4 {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.modal-info-card .info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-info-card .info-prompt {
+    margin: 0;
+    line-height: 1.5;
     font-size: 0.95em;
+    color: #444;
 }
 
-/* ————— Layout para el modal de imagen ————— */
+.modal-info-card .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+}
+
+.modal-info-card .info-row span:first-child {
+    font-weight: 500;
+}
+
+/* ————— Layout para el modal de imagen (imagen + info card lado a lado) ————— */
 #imageModal .modal-content-wrapper {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 32px;
-    padding: 24px;
+    gap: 32px;       /* espacio entre imagen y tarjeta */
+    padding: 24px;   /* separa contenido de bordes del modal */
     max-height: 90vh;
     overflow-y: auto;
 }
 
-/* Que la tarjeta no se achique demasiado */
+/* Impide que la tarjeta se achique demasiado */
 #imageModal .modal-info-card {
     flex-shrink: 0;
-    max-width: 360px;
 }
