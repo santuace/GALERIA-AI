@@ -1,7 +1,6 @@
-
 const galleryData = [
-  { type: "image", src: "imagenes/imagen1.jpg" },
-  { type: "image", src: "imagenes/imagen2.jpg" },
-  { type: "video", src: "imagenes/video1.mp4" },
-  { type: "video", src: "imagenes/video2.mp4" }
+  { type: "image", url: "imagenes/imagen1.jpg" },
+  { type: "image", url: "imagenes/imagen2.jpg" },
+  { type: "video", url: "imagenes/video1.mp4" },
+  { type: "video", url: "imagenes/video2.mp4" }
 ];
