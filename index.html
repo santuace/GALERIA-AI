@@ -1,70 +1,21 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Galería Midmut</title>
-  <link rel="stylesheet" href="estilos_finales_definitivo.css" />
-  <style>
-    .filter-buttons {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-
-    .filter-buttons button {
-      background-color: #333;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      margin: 0 10px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
-    }
-
-    .filter-buttons button:hover {
-      background-color: #555;
-    }
-  </style>
+  <title>Midmut</title>
+  <link rel="stylesheet" href="estilos_finales_definitivo.css"/>
 </head>
 <body>
-  <header>
-    <h1>Midmut</h1>
-    <p>Galería de Imágenes y Videos</p>
-  </header>
-
-  <div class="filter-buttons">
-    <button onclick="filtrar('all')">Todo</button>
-    <button onclick="filtrar('imagen')">Fotos</button>
-    <button onclick="filtrar('video')">Videos</button>
+  <h1>Midmut</h1>
+  <p>Galería de Imágenes y Videos</p>
+  <div class="filters">
+    <button onclick="filterSelection('all')">Todo</button>
+    <button onclick="filterSelection('image')">Fotos</button>
+    <button onclick="filterSelection('video')">Videos</button>
   </div>
-
-  <main id="gallery" class="gallery">
-    <img src="media/image1.jpg" class="imagen" />
-    <img src="media/image2.jpg" class="imagen" />
-    <video src="media/video1.mp4" controls class="video"></video>
-    <img src="media/image3.jpg" class="imagen" />
-    <video src="media/video2.mp4" controls class="video"></video>
-    <!-- Agregá más elementos según tu contenido -->
-  </main>
-
-  <script>
-    function filtrar(tipo) {
-      const imagenes = document.querySelectorAll('.imagen');
-      const videos = document.querySelectorAll('.video');
-
-      if (tipo === 'all') {
-        imagenes.forEach(img => img.style.display = 'block');
-        videos.forEach(vid => vid.style.display = 'block');
-      } else if (tipo === 'imagen') {
-        imagenes.forEach(img => img.style.display = 'block');
-        videos.forEach(vid => vid.style.display = 'none');
-      } else if (tipo === 'video') {
-        imagenes.forEach(img => img.style.display = 'none');
-        videos.forEach(vid => vid.style.display = 'block');
-      }
-    }
-  </script>
+  <div id="gallery" class="gallery"></div>
+  <script src="script.js"></script>
 </body>
 </html>
