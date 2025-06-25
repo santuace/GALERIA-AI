@@ -10,10 +10,7 @@ const galleryImages = [
         filename: "video2.mp4",
         type: "video",
         title: "Animación IA",
-        prompt: "Prompt:
-A bright, hyper-realistic medium shot opens on a gleaming kitchen studio where Gargamel, a thin, obscure 50-years old man with crooked teeth, clad in his signature black robe with tattered sleeves, stands behind a polished marble counter brimming with cooking utensils, herb jars, a steaming cauldron, and an opened mason jar full of very little smurf moving inside. Some Smurfs escaped the mason jar and they are running around the marble counter, in panic.
-
-Audio: Crisp, clear capture of Gargamel’s deep, gravelly voice as he looks directly into the camera and says, “Hello, welcome to GargaChef, my cooking channel. Today I’m going to teach you how to make my famous Smurf Soup.” Underlying ambient sounds include gentle bubbling from the cauldron, rhythmic knife chops on a wooden cutting board, and a soft, upbeat cooking-show jingle fading under his dialogue.
+        prompt: "Prompt: "A bright, hyper-realistic medium shot opens on a gleaming kitchen studio where Gargamel, a thin, obscure 50-years old man with crooked teeth, clad in his signature black robe with tattered sleeves, stands behind a polished marble counter brimming with cooking utensils, herb jars, a steaming cauldron, and an opened mason jar full of very little smurf moving inside. Some Smurfs escaped the mason jar and they are running around the marble counter, in panic. Audio: Crisp, clear capture of Gargamel’s deep, gravelly voice as he looks directly into the camera and says, “Hello, welcome to GargaChef, my cooking channel. Today I’m going to teach you how to make my famous Smurf Soup.” Underlying ambient sounds include gentle bubbling from the cauldron, rhythmic knife chops on a wooden cutting board, and a soft, upbeat cooking-show jingle fading under his dialogue.
 
 The camera, mounted on a smooth Steadicam rig, stands still, framing Gargamel’s animated expression as he cheerfully addresses the audience while he chops carrots, then he puts down the knife and grabs a Smurf from the mason jar and toss it into de pot.
 
