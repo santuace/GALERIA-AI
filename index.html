@@ -76,7 +76,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${image.poster ? `poster="imagenes/${image.poster}"` : ''}>
               </video>`;
         } else {
-            mediaTag = `<img src="imagenes/${image.filename}" alt="${image.title}">`;
+        // <-- Aquí añadimos loading="lazy" y opcionalmente width/height
+            mediaTag = `<img src="imagenes/${image.filename}" alt="${image.title}" loading="lazy"
+            width="300"
+            height="200"
+          >`;
         }
 
         const imageHtml = `
