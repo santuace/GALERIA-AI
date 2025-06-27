@@ -1,6 +1,26 @@
 {
   "dependencies": {
+    "@google-cloud/vision": "^5.2.0",
+    "@google/genai": "^1.7.0",
     "axios": "^1.10.0",
     "dotenv": "^16.5.0"
-  }
+  },
+  "name": "galeria-ai",
+  "version": "1.0.0",
+  "main": "gallery_data_restaurado.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/santuace/GALERIA-AI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/santuace/GALERIA-AI/issues"
+  },
+  "homepage": "https://github.com/santuace/GALERIA-AI#readme",
+  "description": ""
 }
