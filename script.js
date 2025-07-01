@@ -4,7 +4,7 @@ const axios= require('axios');
 
 // -----------------------------------------
 // Inserta tu API Key de OpenAI directamente aquí:
-const apiKey = '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';
+const apiKey = 'UIFEtMA';
 // -----------------------------------------
 
 const imageFolder = path.join(__dirname, 'imagenes');
