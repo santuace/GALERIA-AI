@@ -85,6 +85,7 @@ footer { text-align: center; padding: 20px; font-size: 0.85em; color: #777; }
     overflow: hidden;
     border-radius: 4px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 200px;
 }
 
 .imagen-item:hover {
@@ -98,10 +99,11 @@ footer { text-align: center; padding: 20px; font-size: 0.85em; color: #777; }
     height: auto; 
     display: block; 
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.5s ease;
 }
 
-.imagen-item .lazy-media.loaded {
+.imagen-item.loaded img,
+.imagen-item.loaded video {
     opacity: 1;
 }
 
@@ -119,7 +121,7 @@ footer { text-align: center; padding: 20px; font-size: 0.85em; color: #777; }
     z-index: 1;
 }
 
-.imagen-item .lazy-media.loaded + ::before {
+.imagen-item.loaded::before {
     display: none;
 }
 
