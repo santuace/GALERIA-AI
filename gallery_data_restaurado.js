@@ -99,7 +99,7 @@ const galleryImages = [
     }, 
 ];
 
-for (let i = 182; i >= 1; i--) {
+for (let i = 190; i >= 1; i--) {
     galleryImages.push({
         filename: `imagen${i}.png`,
         type: "image",
