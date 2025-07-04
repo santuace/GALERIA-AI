@@ -19,348 +19,163 @@
     </div>
   </nav>
 
-  <!-- Loading indicator -->
-  <div id="loadingIndicator" class="loading-indicator">
-    <div class="loader"></div>
-    <p>Cargando galería...</p>
-  </div>
-
   <main class="galeria"></main>
 
   <footer>
     <p>Hecho con amor y IA por Santiago Mut</p>
   </footer>
 
+  <!-- Modal de Imagen -->
   <div id="imageModal" class="modal">
     <span class="close-button">&times;</span>
     <div class="modal-content-wrapper">
       <div id="modalMediaContainer"></div>
       <div id="modalInfoContainer" class="modal-info"></div>
     </div>
-    <!-- Navigation arrows -->
     <div class="modal-nav-arrows">
       <button id="prevImageBtn" class="nav-arrow nav-arrow-prev" title="Imagen anterior (←)">‹</button>
       <button id="nextImageBtn" class="nav-arrow nav-arrow-next" title="Siguiente imagen (→)">›</button>
     </div>
   </div>
 
-<div id="aboutMeModal" class="modal">
+  <!-- Modal Sobre mí -->
+  <div id="aboutMeModal" class="modal">
     <span class="close-button about-close-button">&times;</span>
     <div class="modal-content-wrapper">
-        <div class="about-modal-content-wrapper">
-            <div class="about-photo-container">
-                <img src="sobremifoto.jpeg" alt="Tu foto" class="about-photo">
-            </div>
-            <div class="about-text-content">
-                <h2>Sobre mí</h2>
-                <p>
-                  Este no es un portfolio. Es un mood. Una ventana a lo que hay en mi cabeza, 
-                  una colección en constante mutación. Ideas, obsesiones, experimentos. Acá vas 
-                  a ver retratos de personas que no existen, mundos que nadie pidió, estéticas 
-                  buscadas y alegres accidentes. No hay un hilo conductor —hay una energía. 
-                  Bienvenid@s a un hermoso caos.
-                </p>
-                <p>
-                  Soy Santiago, Director Creativo con más de 12 años de carrera en agencias de 
-                  publicidad y esta es mi nueva forma de crear usando herramientas de IA.<br>
-                  Porque al final, todo es un prompt.
-                </p>
-            </div>
+      <div class="about-modal-content-wrapper">
+        <div class="about-photo-container">
+          <img src="sobremifoto.jpeg" alt="Tu foto" class="about-photo">
         </div>
+        <div class="about-text-content">
+          <h2>Sobre mí</h2>
+          <p>Este no es un portfolio. Es un mood. Una ventana a lo que hay en mi cabeza, una colección en constante mutación. Ideas, obsesiones, experimentos. Acá vas a ver retratos de personas que no existen, mundos que nadie pidió, estéticas buscadas y alegres accidentes. No hay un hilo conductor —hay una energía. Bienvenid@s a un hermoso caos.</p>
+          <p>Soy Santiago, Director Creativo con más de 12 años de carrera en agencias de publicidad y esta es mi nueva forma de crear usando herramientas de IA.<br>Porque al final, todo es un prompt.</p>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
   <script src="gallery_data_restaurado.js"></script>
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const imageModal          = document.getElementById('imageModal');
-    const aboutMeModal        = document.getElementById('aboutMeModal');
-    const modalMediaContainer = document.getElementById('modalMediaContainer');
-    const modalInfoContainer  = document.getElementById('modalInfoContainer');
-    const closeImageButton    = document.querySelector('#imageModal .close-button');
-    const openAboutMeButton   = document.getElementById('openAboutMe');
-    const closeAboutMeButton  = document.querySelector('#aboutMeModal .close-button');
-    const loadingIndicator    = document.getElementById('loadingIndicator');
-    const prevImageBtn        = document.getElementById('prevImageBtn');
-    const nextImageBtn        = document.getElementById('nextImageBtn');
+  document.addEventListener('DOMContentLoaded', () => {
+    const galleryEl          = document.querySelector('.galeria');
+    const imageModal         = document.getElementById('imageModal');
+    const aboutMeModal       = document.getElementById('aboutMeModal');
+    const modalMediaContainer= document.getElementById('modalMediaContainer');
+    const modalInfoContainer = document.getElementById('modalInfoContainer');
+    const closeImageBtn      = imageModal.querySelector('.close-button');
+    const openAboutMeBtn     = document.getElementById('openAboutMe');
+    const closeAboutMeBtn    = aboutMeModal.querySelector('.close-button');
+    const prevBtn            = document.getElementById('prevImageBtn');
+    const nextBtn            = document.getElementById('nextImageBtn');
+    let currentIndex = 0;
 
-    let currentImageIndex = 0;
-    let loadedImages = 0;
-    let totalImages = 0;
-
-    // Ocultamos modals al iniciar
-    if (imageModal)   imageModal.style.display   = 'none';
-    if (aboutMeModal) aboutMeModal.style.display = 'none';
-
-    // Error handling function
-    function handleMediaError(element, filename) {
-      console.warn(`No se pudo cargar: ${filename}`);
-      element.style.display = 'none';
-      element.parentElement.style.display = 'none';
-    }
-
-    // Update loading progress
-    function updateLoadingProgress() {
-      loadedImages++;
-      console.log(`Loaded: ${loadedImages}/${totalImages}`);
-      if (loadedImages >= totalImages) {
-        setTimeout(() => {
-          loadingIndicator.style.display = 'none';
-        }, 500);
-      }
-    }
-
-    // ---------------------------------------------------
-    // 1) Ordenamos array: las imágenes con número mayor primero
-    // ---------------------------------------------------
-    galleryImages.sort((a, b) => {
-      const getNum = fn => {
-        const m = fn.match(/\d+/);
-        return m ? parseInt(m[0], 10) : 0;
-      };
+    // 1) Ordenar de mayor a menor según el número en el filename
+    galleryImages.sort((a,b) => {
+      const getNum = f => +(f.match(/\d+/)||[0])[0];
       return getNum(b.filename) - getNum(a.filename);
     });
 
-    totalImages = galleryImages.length;
+    // 2) Crear IntersectionObserver para lazy-loading
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const wrapper = entry.target;
+        const media   = wrapper.querySelector('.lazy-media');
+        const src     = media.dataset.src;
+        if (media.tagName === 'IMG') {
+          media.src = src;
+        } else {
+          media.src = src;
+        }
+        media.addEventListener('load', () => wrapper.classList.add('loaded'));
+        media.addEventListener('loadeddata', () => wrapper.classList.add('loaded'));
+        media.addEventListener('error', () => wrapper.style.display='none');
+        obs.unobserve(wrapper);
+      });
+    }, { rootMargin: '100px', threshold: 0.1 });
 
-    // ---------------------------------------------------
-    // 2) Optimized gallery rendering with intersection observer
-    // ---------------------------------------------------
-    <!-- justo después de ordenar galleryImages y calcular totalImages -->
-  const gallery = document.querySelector('.galeria');
+    // 3) Inyectar items en DOM
+    galleryImages.forEach((img, i) => {
+      const mediaTag = img.type === 'video'
+        ? `<video data-src="imagenes/${img.filename}" muted loop playsinline class="lazy-media"${img.poster?` poster="imagenes/${img.poster}"`:''}></video>`
+        : `<img data-src="imagenes/${img.filename}" alt="${img.title}" class="lazy-media">`;
 
-  // creamos el IntersectionObserver para los wrappers .imagen-item
-  const itemObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const wrapper = entry.target;              // es el .imagen-item
-      const media   = wrapper.querySelector('.lazy-media');
-      if (!media) return observer.unobserve(wrapper);
-
-      const realSrc = media.dataset.src;
-      // cargamos la imagen o video
-      if (media.tagName === 'IMG') {
-        media.src = realSrc;
-        media.onload = () => {
-          wrapper.classList.add('loaded');
-          updateLoadingProgress();
-        };
-        media.onerror = () => {
-          console.warn(`Error cargando imagen: ${realSrc}`);
-          wrapper.style.display = 'none';
-          updateLoadingProgress();
-        };
-      } else if (media.tagName === 'VIDEO') {
-        media.src = realSrc;
-        media.onloadeddata = () => {
-          wrapper.classList.add('loaded');
-          updateLoadingProgress();
-        };
-        media.onerror = () => {
-          console.warn(`Error cargando video: ${realSrc}`);
-          wrapper.style.display = 'none';
-          updateLoadingProgress();
-        };
-      }
-
-      observer.unobserve(wrapper);
+      const html = `
+        <div class="imagen-item" data-index="${i}" data-prompt="${img.prompt}" data-model="${img.model}" data-filename="${img.filename}">
+          ${mediaTag}
+        </div>`;
+      galleryEl.insertAdjacentHTML('beforeend', html);
     });
-  }, {
-    root: null,
-    rootMargin: '100px',
-    threshold: 0.1
-  });
 
-  // inyectamos todos los ítems en el dom con data-src y clase .lazy-media
-  galleryImages.forEach((image, index) => {
-    let mediaTag;
-    if (image.type === "video") {
-      mediaTag = `
-        <video
-          data-src="imagenes/${image.filename}"
-          muted loop playsinline
-          class="lazy-media"
-          ${image.poster ? `poster="imagenes/${image.poster}"` : ''}
-          preload="none">
-        </video>`;
-    } else {
-      mediaTag = `
-        <img
-          data-src="imagenes/${image.filename}"
-          alt="${image.title}"
-          class="lazy-media">
-      `;
-    }
+    // 4) Observar cada .imagen-item
+    document.querySelectorAll('.imagen-item').forEach(item => observer.observe(item));
 
-    const html = `
-      <div class="imagen-item loading"
-           data-index="${index}"
-           data-filename="${image.filename}"
-           data-title="${image.title}"
-           data-prompt="${image.prompt}"
-           data-model="${image.model || ''}"
-           ${image.poster ? `data-poster="${image.poster}"` : ''}>
-        ${mediaTag}
-      </div>`;
-    gallery.insertAdjacentHTML('beforeend', html);
-  });
-
-  // observamos cada wrapper, no el media
-  document.querySelectorAll('.imagen-item').forEach(item => {
-    itemObserver.observe(item);
-  });
-
-  // si no hay imágenes, ocultamos el loader
-  if (totalImages === 0) loadingIndicator.style.display = 'none';
-
-    // ---------------------------------------------------
-    // 3) Modal navigation functions
-    // ---------------------------------------------------
-    function openModal(index) {
-      currentImageIndex = index;
-      const image = galleryImages[index];
-      
+    // Función para abrir modal (imagen o video + info)
+    function openModal(idx) {
+      currentIndex = idx;
+      const data = galleryImages[idx];
       modalMediaContainer.innerHTML = '';
-      modalInfoContainer.innerHTML = '';
+      modalInfoContainer.innerHTML  = '';
 
-      if (image.type === "video") {
-        const videoElement = document.createElement('video');
-        videoElement.src = `imagenes/${image.filename}`;
-        videoElement.controls = true;
-        videoElement.autoplay = true;
-        videoElement.loop = true;
-        videoElement.muted = false;
-        videoElement.playsinline = true;
-        videoElement.classList.add('modal-content');
-        if (image.poster) videoElement.poster = `imagenes/${image.poster}`;
-        
-        videoElement.onerror = () => {
-          handleMediaError(videoElement, image.filename);
-          modalMediaContainer.innerHTML = `
-            <div class="error-message">
-              <p>❌ No se pudo cargar el video: ${image.filename}</p>
-            </div>`;
-        };
-        
-        modalMediaContainer.appendChild(videoElement);
-      } else {
-        const imgElement = document.createElement('img');
-        imgElement.src = `imagenes/${image.filename}`;
-        imgElement.alt = image.title;
-        imgElement.classList.add('modal-content');
-        
-        imgElement.onerror = () => {
-          handleMediaError(imgElement, image.filename);
-          modalMediaContainer.innerHTML = `
-            <div class="error-message">
-              <p>❌ No se pudo cargar la imagen: ${image.filename}</p>
-            </div>`;
-        };
-        
-        modalMediaContainer.appendChild(imgElement);
-      }
+      const el = data.type === 'video'
+        ? Object.assign(document.createElement('video'), {
+            src: `imagenes/${data.filename}`, controls: true, autoplay: true, loop:true, playsinline:true
+          })
+        : Object.assign(document.createElement('img'), {
+            src: `imagenes/${data.filename}`, alt: data.title
+          });
+      el.classList.add('modal-content');
+      modalMediaContainer.appendChild(el);
 
-      // Info card
       modalInfoContainer.innerHTML = `
         <div class="modal-info-card">
           <div class="info-header">
-            <svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm.75 15h-1.5v-1.5h1.5V17zm0-3h-1.5V7h1.5v7z"/>
-            </svg>
+            <svg class="info-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm.75 15h-1.5v-1.5h1.5V17zm0-3h-1.5V7h1.5v7z"/></svg>
             <h4>Prompt</h4>
           </div>
           <div class="info-body">
-            <p class="info-prompt">${image.prompt}</p>
-            <div class="info-row"><span>Modelo</span><span>${image.model}</span></div>
-            <div class="info-row"><span>Archivo</span><span>${image.filename}</span></div>
-            <div class="info-row"><span>Posición</span><span>${index + 1} de ${galleryImages.length}</span></div>
+            <p class="info-prompt">${data.prompt}</p>
+            <div class="info-row"><span>Modelo</span><span>${data.model}</span></div>
+            <div class="info-row"><span>Archivo</span><span>${data.filename}</span></div>
           </div>
         </div>`;
-
-      // Update navigation buttons
-      prevImageBtn.style.display = index > 0 ? 'block' : 'none';
-      nextImageBtn.style.display = index < galleryImages.length - 1 ? 'block' : 'none';
-      
-      imageModal.style.display = "flex";
+      prevBtn.style.display = idx>0 ? 'block':'none';
+      nextBtn.style.display = idx<galleryImages.length-1 ? 'block':'none';
+      imageModal.style.display = 'flex';
     }
 
-    function navigateModal(direction) {
-      const newIndex = currentImageIndex + direction;
-      if (newIndex >= 0 && newIndex < galleryImages.length) {
-        openModal(newIndex);
-      }
-    }
-
-    // ---------------------------------------------------
-    // 4) Event listeners
-    // ---------------------------------------------------
-    
-    // Gallery item clicks
-    const galleryItems = document.querySelectorAll('.imagen-item');
-    galleryItems.forEach(item => {
-      item.addEventListener('click', function() {
-        const index = parseInt(this.dataset.index);
-        openModal(index);
-      });
+    // 5) Event listeners: click en cada ítem
+    document.querySelectorAll('.imagen-item').forEach(item => {
+      item.addEventListener('click', () =>
+        openModal(+item.dataset.index)
+      );
     });
 
-    // Navigation buttons
-    prevImageBtn.addEventListener('click', () => navigateModal(-1));
-    nextImageBtn.addEventListener('click', () => navigateModal(1));
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (imageModal.style.display === 'flex') {
-        switch(e.key) {
-          case 'ArrowLeft':
-          case 'ArrowUp':
-            e.preventDefault();
-            navigateModal(-1);
-            break;
-          case 'ArrowRight':
-          case 'ArrowDown':
-            e.preventDefault();
-            navigateModal(1);
-            break;
-          case 'Escape':
-            e.preventDefault();
-            imageModal.style.display = "none";
-            const vid = modalMediaContainer.querySelector('video');
-            if (vid) vid.pause();
-            break;
-        }
-      }
-    });
-
-    // Close modal handlers
-    closeImageButton.addEventListener('click', () => {
-      imageModal.style.display = "none";
-      const vid = modalMediaContainer.querySelector('video');
-      if (vid) vid.pause();
-    });
-
+    // Navegación modal
+    prevBtn.addEventListener('click', ()=> openModal(currentIndex-1));
+    nextBtn.addEventListener('click', ()=> openModal(currentIndex+1));
+    closeImageBtn.addEventListener('click', ()=> imageModal.style.display='none');
     imageModal.addEventListener('click', e => {
-      if (e.target === imageModal) {
-        imageModal.style.display = "none";
-        const vid = modalMediaContainer.querySelector('video');
-        if (vid) vid.pause();
-      }
+      if (e.target===imageModal) imageModal.style.display='none';
     });
 
-    // About me modal
-    openAboutMeButton.addEventListener('click', e => {
+    // Teclado
+    document.addEventListener('keydown', e => {
+      if (imageModal.style.display!=='flex') return;
+      if (e.key==='Escape') return imageModal.style.display='none';
+      if (['ArrowLeft','ArrowUp'].includes(e.key)) openModal(currentIndex-1);
+      if (['ArrowRight','ArrowDown'].includes(e.key)) openModal(currentIndex+1);
+    });
+
+    // Sobre mí modal
+    openAboutMeBtn.addEventListener('click', e=>{
       e.preventDefault();
-      aboutMeModal.style.display = "flex";
+      aboutMeModal.style.display='flex';
     });
-
-    closeAboutMeButton.addEventListener('click', () => {
-      aboutMeModal.style.display = "none";
-    });
-
-    aboutMeModal.addEventListener('click', e => {
-      if (e.target === aboutMeModal) {
-        aboutMeModal.style.display = "none";
-      }
+    closeAboutMeBtn.addEventListener('click', ()=> aboutMeModal.style.display='none');
+    aboutMeModal.addEventListener('click', e=>{
+      if (e.target===aboutMeModal) aboutMeModal.style.display='none';
     });
   });
   </script>
