@@ -19,6 +19,12 @@
     </div>
   </nav>
 
+  <!-- Loading indicator -->
+  <div id="loadingIndicator" class="loading-indicator">
+    <div class="loader"></div>
+    <p>Cargando galería...</p>
+  </div>
+
   <main class="galeria"></main>
 
   <footer>
@@ -30,6 +36,11 @@
     <div class="modal-content-wrapper">
       <div id="modalMediaContainer"></div>
       <div id="modalInfoContainer" class="modal-info"></div>
+    </div>
+    <!-- Navigation arrows -->
+    <div class="modal-nav-arrows">
+      <button id="prevImageBtn" class="nav-arrow nav-arrow-prev" title="Imagen anterior (←)">‹</button>
+      <button id="nextImageBtn" class="nav-arrow nav-arrow-next" title="Siguiente imagen (→)">›</button>
     </div>
   </div>
 
@@ -69,10 +80,32 @@
     const closeImageButton    = document.querySelector('#imageModal .close-button');
     const openAboutMeButton   = document.getElementById('openAboutMe');
     const closeAboutMeButton  = document.querySelector('#aboutMeModal .close-button');
+    const loadingIndicator    = document.getElementById('loadingIndicator');
+    const prevImageBtn        = document.getElementById('prevImageBtn');
+    const nextImageBtn        = document.getElementById('nextImageBtn');
+
+    let currentImageIndex = 0;
+    let loadedImages = 0;
+    let totalImages = 0;
 
     // Ocultamos modals al iniciar
     if (imageModal)   imageModal.style.display   = 'none';
     if (aboutMeModal) aboutMeModal.style.display = 'none';
+
+    // Error handling function
+    function handleMediaError(element, filename) {
+      console.warn(`No se pudo cargar: ${filename}`);
+      element.style.display = 'none';
+      element.parentElement.style.display = 'none';
+    }
+
+    // Update loading progress
+    function updateLoadingProgress() {
+      loadedImages++;
+      if (loadedImages >= totalImages) {
+        loadingIndicator.style.display = 'none';
+      }
+    }
 
     // ---------------------------------------------------
     // 1) Ordenamos array: las imágenes con número mayor primero
@@ -84,24 +117,68 @@
       };
       return getNum(b.filename) - getNum(a.filename);
     });
-    // ---------------------------------------------------
 
-    // Renderizamos galería
+    totalImages = galleryImages.length;
+
+    // ---------------------------------------------------
+    // 2) Optimized gallery rendering with intersection observer
+    // ---------------------------------------------------
     const gallery = document.querySelector('.galeria');
-    galleryImages.forEach(image => {
+    
+    // Create intersection observer for lazy loading
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const lazyElement = entry.target;
+          const realSrc = lazyElement.dataset.src;
+          
+          if (lazyElement.tagName === 'IMG') {
+            lazyElement.src = realSrc;
+            lazyElement.onload = () => {
+              lazyElement.classList.add('loaded');
+              updateLoadingProgress();
+            };
+            lazyElement.onerror = () => {
+              handleMediaError(lazyElement, realSrc);
+              updateLoadingProgress();
+            };
+          } else if (lazyElement.tagName === 'VIDEO') {
+            lazyElement.src = realSrc;
+            lazyElement.onloadeddata = () => {
+              lazyElement.classList.add('loaded');
+              updateLoadingProgress();
+            };
+            lazyElement.onerror = () => {
+              handleMediaError(lazyElement, realSrc);
+              updateLoadingProgress();
+            };
+          }
+          
+          observer.unobserve(lazyElement);
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '50px',
+      threshold: 0.1
+    });
+
+    // Render gallery items
+    galleryImages.forEach((image, index) => {
       let mediaTag;
       if (image.type === "video") {
         mediaTag = `
           <video
-            src="imagenes/${image.filename}"
+            data-src="imagenes/${image.filename}"
             muted autoplay loop playsinline
+            class="lazy-media"
             ${image.poster ? `poster="imagenes/${image.poster}"` : ''}>
           </video>`;
       } else {
         mediaTag = `<img
-            src="imagenes/${image.filename}"
+            data-src="imagenes/${image.filename}"
             alt="${image.title}"
-            loading="lazy"
+            class="lazy-media"
             width="300"
             height="200"
           >`;
@@ -109,6 +186,7 @@
 
       const imageHtml = `
         <div class="imagen-item"
+             data-index="${index}"
              data-type="${image.type}"
              data-filename="${image.filename}"
              data-title="${image.title}"
@@ -120,64 +198,137 @@
       gallery.insertAdjacentHTML('beforeend', imageHtml);
     });
 
-    // Abrir modal al clickear cada ítem
+    // Apply intersection observer to all lazy media
+    document.querySelectorAll('.lazy-media').forEach(media => {
+      imageObserver.observe(media);
+    });
+
+    // ---------------------------------------------------
+    // 3) Modal navigation functions
+    // ---------------------------------------------------
+    function openModal(index) {
+      currentImageIndex = index;
+      const image = galleryImages[index];
+      
+      modalMediaContainer.innerHTML = '';
+      modalInfoContainer.innerHTML = '';
+
+      if (image.type === "video") {
+        const videoElement = document.createElement('video');
+        videoElement.src = `imagenes/${image.filename}`;
+        videoElement.controls = true;
+        videoElement.autoplay = true;
+        videoElement.loop = true;
+        videoElement.muted = false;
+        videoElement.playsinline = true;
+        videoElement.classList.add('modal-content');
+        if (image.poster) videoElement.poster = `imagenes/${image.poster}`;
+        
+        videoElement.onerror = () => {
+          handleMediaError(videoElement, image.filename);
+          modalMediaContainer.innerHTML = `
+            <div class="error-message">
+              <p>❌ No se pudo cargar el video: ${image.filename}</p>
+            </div>`;
+        };
+        
+        modalMediaContainer.appendChild(videoElement);
+      } else {
+        const imgElement = document.createElement('img');
+        imgElement.src = `imagenes/${image.filename}`;
+        imgElement.alt = image.title;
+        imgElement.classList.add('modal-content');
+        
+        imgElement.onerror = () => {
+          handleMediaError(imgElement, image.filename);
+          modalMediaContainer.innerHTML = `
+            <div class="error-message">
+              <p>❌ No se pudo cargar la imagen: ${image.filename}</p>
+            </div>`;
+        };
+        
+        modalMediaContainer.appendChild(imgElement);
+      }
+
+      // Info card
+      modalInfoContainer.innerHTML = `
+        <div class="modal-info-card">
+          <div class="info-header">
+            <svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm.75 15h-1.5v-1.5h1.5V17zm0-3h-1.5V7h1.5v7z"/>
+            </svg>
+            <h4>Prompt</h4>
+          </div>
+          <div class="info-body">
+            <p class="info-prompt">${image.prompt}</p>
+            <div class="info-row"><span>Modelo</span><span>${image.model}</span></div>
+            <div class="info-row"><span>Archivo</span><span>${image.filename}</span></div>
+            <div class="info-row"><span>Posición</span><span>${index + 1} de ${galleryImages.length}</span></div>
+          </div>
+        </div>`;
+
+      // Update navigation buttons
+      prevImageBtn.style.display = index > 0 ? 'block' : 'none';
+      nextImageBtn.style.display = index < galleryImages.length - 1 ? 'block' : 'none';
+      
+      imageModal.style.display = "flex";
+    }
+
+    function navigateModal(direction) {
+      const newIndex = currentImageIndex + direction;
+      if (newIndex >= 0 && newIndex < galleryImages.length) {
+        openModal(newIndex);
+      }
+    }
+
+    // ---------------------------------------------------
+    // 4) Event listeners
+    // ---------------------------------------------------
+    
+    // Gallery item clicks
     const galleryItems = document.querySelectorAll('.imagen-item');
     galleryItems.forEach(item => {
       item.addEventListener('click', function() {
-        const type     = this.dataset.type;
-        const filename = this.dataset.filename;
-        const title    = this.dataset.title;
-        const prompt   = this.dataset.prompt;
-        const model    = this.dataset.model;
-        const poster   = this.dataset.poster;
-
-        modalMediaContainer.innerHTML = '';
-        modalInfoContainer.innerHTML  = '';
-
-        if (type === "video") {
-          const videoElement = document.createElement('video');
-          videoElement.src        = `imagenes/${filename}`;
-          videoElement.controls   = true;
-          videoElement.autoplay   = true;
-          videoElement.loop       = true;
-          videoElement.muted      = false;
-          videoElement.playsinline= true;
-          videoElement.classList.add('modal-content');
-          if (poster) videoElement.poster = `imagenes/${poster}`;
-          modalMediaContainer.appendChild(videoElement);
-        } else {
-          const imgElement = document.createElement('img');
-          imgElement.src   = `imagenes/${filename}`;
-          imgElement.alt   = title;
-          imgElement.classList.add('modal-content');
-          modalMediaContainer.appendChild(imgElement);
-        }
-
-        // Info card
-        modalInfoContainer.innerHTML = `
-          <div class="modal-info-card">
-            <div class="info-header">
-              <svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2zm.75 15h-1.5v-1.5h1.5V17zm0-3h-1.5V7h1.5v7z"/>
-              </svg>
-              <h4>Prompt</h4>
-            </div>
-            <div class="info-body">
-              <p class="info-prompt">${prompt}</p>
-              <div class="info-row"><span>Modelo</span><span>${model}</span></div>
-              <div class="info-row"><span>Archivo</span><span>${filename}</span></div>
-            </div>
-          </div>`;
-        imageModal.style.display = "flex";
+        const index = parseInt(this.dataset.index);
+        openModal(index);
       });
     });
 
-    // Cerrar modal imagen
+    // Navigation buttons
+    prevImageBtn.addEventListener('click', () => navigateModal(-1));
+    nextImageBtn.addEventListener('click', () => navigateModal(1));
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (imageModal.style.display === 'flex') {
+        switch(e.key) {
+          case 'ArrowLeft':
+          case 'ArrowUp':
+            e.preventDefault();
+            navigateModal(-1);
+            break;
+          case 'ArrowRight':
+          case 'ArrowDown':
+            e.preventDefault();
+            navigateModal(1);
+            break;
+          case 'Escape':
+            e.preventDefault();
+            imageModal.style.display = "none";
+            const vid = modalMediaContainer.querySelector('video');
+            if (vid) vid.pause();
+            break;
+        }
+      }
+    });
+
+    // Close modal handlers
     closeImageButton.addEventListener('click', () => {
       imageModal.style.display = "none";
       const vid = modalMediaContainer.querySelector('video');
       if (vid) vid.pause();
     });
+
     imageModal.addEventListener('click', e => {
       if (e.target === imageModal) {
         imageModal.style.display = "none";
@@ -186,14 +337,16 @@
       }
     });
 
-    // Abrir/Cerrar modal “Sobre mí”
+    // About me modal
     openAboutMeButton.addEventListener('click', e => {
       e.preventDefault();
       aboutMeModal.style.display = "flex";
     });
+
     closeAboutMeButton.addEventListener('click', () => {
       aboutMeModal.style.display = "none";
     });
+
     aboutMeModal.addEventListener('click', e => {
       if (e.target === aboutMeModal) {
         aboutMeModal.style.display = "none";
