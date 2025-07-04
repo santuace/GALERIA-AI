@@ -98,7 +98,7 @@
     // 3) Inyectar items en DOM
     galleryImages.forEach((img, i) => {
       const mediaTag = img.type === 'video'
-        ? `<video data-src="imagenes/${img.filename}" muted loop playsinline class="lazy-media"${img.poster?` poster="imagenes/${img.poster}"`:''}></video>`
+        ? `<video data-src="imagenes/${img.filename}" muted autoplay loop playsinline class="lazy-media"${img.poster?` poster="imagenes/${img.poster}"`:''}></video>`
         : `<img data-src="imagenes/${img.filename}" alt="${img.title}" class="lazy-media">`;
 
       const html = `
