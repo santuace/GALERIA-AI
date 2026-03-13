@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MIDMUT — AI Art by Santiago Mut</title>
+  <link rel="stylesheet" href="estilos_finales_definitivo.css?v=2" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <img src="monograma.png" alt="Monograma" class="logo"/>
+    </div>
+    <div class="navbar-right">
+      <a href="#" id="openAboutMe" class="nav-link">Sobre mi</a>
+      <a href="https://www.linkedin.com/in/santiagomut/" class="nav-link" target="_blank">Contacto</a>
+    </div>
+  </nav>
+
+  <div class="filter-bar">
+    <div class="filter-bar-inner">
+      <button class="filter-btn active" data-filter="all">Todo</button>
+      <button class="filter-btn" data-filter="image">Imágenes</button>
+      <button class="filter-btn" data-filter="video">Videos</button>
+    </div>
+  </div>
+
+  <main class="galeria"></main>
+
+  <footer>
+    <p>Hecho con amor y IA por Santiago Mut</p>
+  </footer>
+
+  <!-- Modal de Imagen -->
+  <div id="imageModal" class="modal">
+    <span class="close-button">&times;</span>
+    <button id="prevImageBtn" class="nav-arrow nav-arrow-prev" title="Anterior">&#8249;</button>
+    <button id="nextImageBtn" class="nav-arrow nav-arrow-next" title="Siguiente">&#8250;</button>
+    <div class="modal-content-wrapper">
+      <div id="modalMediaContainer"></div>
+      <div id="modalInfoContainer" class="modal-info"></div>
+    </div>
+  </div>
+
+  <!-- Modal Sobre mi -->
+  <div id="aboutMeModal" class="modal">
+    <span class="close-button about-close-button">&times;</span>
+    <div class="modal-content-wrapper">
+      <div class="about-modal-content-wrapper">
+        <div class="about-photo-container">
+          <img src="sobremifoto.jpeg" alt="Tu foto" class="about-photo"/>
+        </div>
+        <div class="about-text-content">
+          <h2>Sobre mi</h2>
+          <p>Este no es un portfolio. Es un mood. Una ventana a lo que hay en mi cabeza, una coleccion en constante mutacion. Ideas, obsesiones, experimentos. Aca vas a ver retratos de personas que no existen, mundos que nadie pidio, esteticas buscadas y alegres accidentes. No hay un hilo conductor —hay una energia. Bienvenid@s a un hermoso caos.</p>
+          <p>Soy Santiago, Director Creativo con mas de 12 anos de carrera en agencias de publicidad y esta es mi nueva forma de crear usando herramientas de IA.<br/>Porque al final, todo es un prompt.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="gallery_data_restaurado.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const galleryEl           = document.querySelector('.galeria');
+    const imageModal          = document.getElementById('imageModal');
+    const aboutMeModal        = document.getElementById('aboutMeModal');
+    const modalMediaContainer = document.getElementById('modalMediaContainer');
+    const modalInfoContainer  = document.getElementById('modalInfoContainer');
+    const closeImageBtn       = imageModal.querySelector('.close-button');
+    const openAboutMeBtn      = document.getElementById('openAboutMe');
+    const closeAboutMeBtn     = aboutMeModal.querySelector('.close-button');
+    const prevBtn             = document.getElementById('prevImageBtn');
+    const nextBtn             = document.getElementById('nextImageBtn');
+    let currentIndex = 0;
+
+    // 0) Copia mutable de galleryImages
+    let items = galleryImages.slice();
+
+    // 1) Orden de mayor a menor segun numero en el filename
+    items.sort((a, b) => {
+      const getNum = fn => +(fn.match(/\d+/) || [0])[0];
+      return getNum(b.filename) - getNum(a.filename);
+    });
+
+    // 3) Inyectar items
+    //    Imagenes: src directo + loading="lazy"
+    //    Videos: src directo + preload="none", el observer los activa al ser visibles
+    items.forEach((img, idx) => {
+      const mediaTag = img.type === 'video'
+        ? `<video
+             src="imagenes/${img.filename}"
+             muted loop playsinline
+             preload="none"
+             class="gallery-media"${img.poster ? ` poster="imagenes/${img.poster}"` : ''}>
+           </video>`
+        : `<img
+             src="imagenes/${img.filename}"
+             alt="${img.title}"
+             loading="lazy"
+             decoding="async"
+             class="gallery-media"/>`;
+
+      const videoIcon = img.type === 'video'
+        ? `<span class="video-play-icon">▶</span>`
+        : '';
+
+      galleryEl.insertAdjacentHTML('beforeend', `
+        <div class="imagen-item" data-index="${idx}"
+             data-type="${img.type}"
+             data-prompt="${img.prompt}"
+             data-model="${img.model}"
+             data-filename="${img.filename}">
+          ${mediaTag}
+          ${videoIcon}
+          <span class="item-model-badge">${img.model}</span>
+        </div>`);
+    });
+
+    // 4) Marcar como loaded cuando cada media cargue
+    document.querySelectorAll('.imagen-item').forEach(item => {
+      const media = item.querySelector('.gallery-media');
+      if (!media) return;
+
+      if (media.tagName === 'IMG') {
+        // Imagen: load event o ya cargada
+        if (media.complete && media.naturalWidth > 0) {
+          item.classList.add('loaded');
+        } else {
+          media.addEventListener('load', () => item.classList.add('loaded'), { once: true });
+          media.addEventListener('error', () => { item.style.display = 'none'; }, { once: true });
+        }
+      } else {
+        // Video: usar canplay + playing + timeout fallback
+        const markLoaded = () => item.classList.add('loaded');
+        media.addEventListener('canplay', markLoaded, { once: true });
+        media.addEventListener('playing', markLoaded, { once: true });
+        media.addEventListener('loadeddata', markLoaded, { once: true });
+        media.addEventListener('error', () => { item.style.display = 'none'; }, { once: true });
+        // Timeout fallback: mostrar video aunque no haya disparado eventos
+        setTimeout(() => {
+          if (!item.classList.contains('loaded')) {
+            item.classList.add('loaded');
+          }
+        }, 1500);
+      }
+    });
+
+    // 5) IntersectionObserver para activar videos solo cuando son visibles
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (!video) return;
+        if (entry.isIntersecting) {
+          if (video.preload !== 'auto') {
+            video.preload = 'auto';
+            video.load();
+          }
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { rootMargin: '300px', threshold: 0 });
+
+    document.querySelectorAll('.imagen-item').forEach(item => {
+      if (item.querySelector('video')) videoObserver.observe(item);
+    });
+
+    // 5b) Fallback: si el observer no dispara en 2s, forzar carga de videos visibles
+    setTimeout(() => {
+      document.querySelectorAll('.imagen-item video').forEach(video => {
+        if (video.readyState === 0) {
+          const rect = video.getBoundingClientRect();
+          if (rect.top < window.innerHeight + 300) {
+            video.preload = 'auto';
+            video.load();
+            video.play().catch(() => {});
+          }
+        }
+      });
+    }, 2000);
+
+    // Funcion para abrir modal
+    function openModal(idx) {
+      if (idx < 0 || idx >= items.length) return;
+      currentIndex = idx;
+      const data = items[idx];
+      modalMediaContainer.innerHTML = '';
+      modalInfoContainer.innerHTML  = '';
+
+      const el = data.type === 'video'
+        ? Object.assign(document.createElement('video'), {
+            src: `imagenes/${data.filename}`,
+            controls: true,
+            autoplay: true,
+            loop: true,
+            muted: true,
+            playsinline: true
+          })
+        : Object.assign(document.createElement('img'), {
+            src: `imagenes/${data.filename}`,
+            alt: data.title
+          });
+      el.classList.add('modal-content');
+      modalMediaContainer.appendChild(el);
+
+      modalInfoContainer.innerHTML = `
+        <div class="modal-info-card">
+          <div class="info-header">
+            <span class="modal-model-badge">${data.model}</span>
+          </div>
+          <div class="info-body">
+            <p class="info-prompt">${data.prompt}</p>
+            <div class="info-row"><span>Tipo</span><span>${data.type === 'video' ? 'Video' : 'Imagen'}</span></div>
+            <div class="info-row"><span>Archivo</span><span>${data.filename}</span></div>
+          </div>
+        </div>`;
+
+      prevBtn.style.display = idx > 0 ? 'flex' : 'none';
+      nextBtn.style.display = idx < items.length - 1 ? 'flex' : 'none';
+      imageModal.style.display = 'flex';
+    }
+
+    // Click en miniaturas
+    document.querySelectorAll('.imagen-item').forEach(item => {
+      item.addEventListener('click', () => openModal(+item.dataset.index));
+    });
+
+    // Navegacion modal
+    prevBtn.addEventListener('click', () => openModal(currentIndex - 1));
+    nextBtn.addEventListener('click', () => openModal(currentIndex + 1));
+    closeImageBtn.addEventListener('click', () => {
+      imageModal.style.display = 'none';
+      const vid = modalMediaContainer.querySelector('video');
+      if (vid) vid.pause();
+    });
+    imageModal.addEventListener('click', e => {
+      if (e.target === imageModal) {
+        imageModal.style.display = 'none';
+        const vid = modalMediaContainer.querySelector('video');
+        if (vid) vid.pause();
+      }
+    });
+
+    // Escape / flechas
+    document.addEventListener('keydown', e => {
+      if (imageModal.style.display !== 'flex') return;
+      if (e.key === 'Escape') {
+        imageModal.style.display = 'none';
+        const vid = modalMediaContainer.querySelector('video');
+        if (vid) vid.pause();
+        return;
+      }
+      if (['ArrowLeft','ArrowUp'].includes(e.key))   openModal(currentIndex - 1);
+      if (['ArrowRight','ArrowDown'].includes(e.key)) openModal(currentIndex + 1);
+    });
+
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.imagen-item').forEach(item => {
+          if (filter === 'all' || item.dataset.type === filter) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Sobre mi
+    openAboutMeBtn.addEventListener('click', e => {
+      e.preventDefault();
+      aboutMeModal.style.display = 'flex';
+    });
+    closeAboutMeBtn.addEventListener('click', () => aboutMeModal.style.display = 'none');
+    aboutMeModal.addEventListener('click', e => {
+      if (e.target === aboutMeModal) aboutMeModal.style.display = 'none';
+    });
+  });
+  </script>
+</body>
+</html>

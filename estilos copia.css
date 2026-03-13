@@ -1,0 +1,339 @@
+/* REGLAS PARA NEUTRALIZAR POSIBLES CONFLICTOS DE APILAMIENTO EN HTML Y BODY */
+/* Esto ayuda a que los modales (position: fixed) se muestren correctamente */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden; /* Evita scroll horizontal innecesario */
+}
+}
+
+/* Importar la fuente Inter de Google Fonts - ¡ESTA ES LA PRIMERA LÍNEA! */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Estilos básicos para toda la página */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ESTILOS PARA LA BARRA DE NAVEGACIÓN SUPERIOR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-left .logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* Estilos para los enlaces "Sobre mí" y "Contacto" */
+.nav-link {
+    text-decoration: none;
+    color: #4a4a4a;
+    font-weight: 600;
+    font-size: 1.05em;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #3f51b5;
+}
+
+/* ESTILOS PARA LA GALERÍA CON EFECTO MASONRY */
+.galeria {
+    column-count: 5; /* ¡CLAVE PARA EL LAYOUT MASONRY! */
+    column-gap: 8px;
+    padding: 8px;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.imagen-item {
+    background-color: white;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+    margin-bottom: 8px;
+    break-inside: avoid; 
+    transition: none;
+    cursor: pointer; 
+    position: relative;
+}
+
+.imagen-item:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.imagen-item img,
+.imagen-item video {
+    width: 100%; 
+    height: auto; 
+    display: block;
+    border-bottom: none;
+}
+
+.info-imagen {
+    display: none;
+}
+
+/* El pie de página */
+<footer>
+    <p>Hecho con amor y IA por [Tu Nombre]</p>
+</footer>
+
+/* ESTILOS BÁSICOS PARA AMBOS VISORES (IMAGEN Y SOBRE MÍ) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    display: flex; /* <-- importante para centrar */
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ESTILOS ESPECÍFICOS PARA EL VISOR DE IMAGEN/VIDEO */
+.modal-content-wrapper {
+    background-color: white;
+    border-radius: 0;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    display: flex; /* ¡CORREGIDO! Solo display: flex. NO debe haber display: block aquí. */
+    align-items: center;
+    justify-content: center;
+    max-width: 80vw; /* ¡CORRECCIÓN CLAVE! Limita el ancho del contenedor blanco al 80% de la ventana. */
+    max-height: 80vh; /* ¡CORRECCIÓN CLAVE! Limita la altura del contenedor blanco al 80% del alto de la ventana. */
+    overflow: auto; 
+}
+
+.modal-content { /* La imagen o video dentro del contenedor blanco */
+    display: block;
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain;
+    border-radius: 0; 
+    box-shadow: none; 
+}
+
+/* ESTILOS ESPECÍFICOS PARA EL VISOR "SOBRE MÍ" */
+#aboutMeModal.modal { 
+    z-index: 10000; 
+}
+
+.about-modal-content-wrapper {
+    background-color: white;
+    padding: 20px;
+    border-radius: 0; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    max-width: 900px;
+    max-height: 90vh; 
+    overflow-y: auto; 
+    
+    display: flex; 
+    gap: 30px; 
+    align-items: flex-start;
+    text-align: left; 
+}
+
+.about-photo-container {
+    flex-shrink: 0; 
+    width: 250px; 
+    height: auto; 
+    overflow: hidden; 
+    border-radius: 4px; 
+}
+
+.about-photo {
+    width: 100%; 
+    height: auto; 
+    display: block;
+    border-radius: 0; 
+    object-fit: cover; 
+    border: none; 
+    box-shadow: none; 
+}
+
+.about-text-content {
+    flex-grow: 1; 
+    padding-top: 5px; 
+}
+
+.about-text-content h2 {
+    color: #4a4a4a; 
+    font-size: 1.8em; 
+    margin-top: 0; 
+    margin-bottom: 15px;
+    text-align: left; 
+}
+
+.about-text-content p {
+    font-size: 1.05em; 
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1em;
+    text-align: justify; 
+}
+
+/* Ajustes para el botón de cerrar del modal "Sobre Mí" */
+.about-close-button {
+    /* top: 10px; */
+    /* right: 10px; */
+}
+
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 1400px) {
+    .galeria {
+        column-count: 4;
+    }
+}
+
+@media (max-width: 1024px) {
+    .galeria {
+        column-count: 3;
+    }
+    .navbar {
+        padding: 15px 25px;
+    }
+    .about-modal-content-wrapper { 
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 600px;
+        padding: 20px;
+    }
+    .about-photo-container {
+        width: 80%; 
+        max-width: 280px; 
+    }
+    .about-text-content {
+        text-align: center; 
+    }
+    .about-text-content h2, .about-text-content p {
+        text-align: center; 
+    }
+    .modal-content-wrapper { /* Aquí se refiere al modal de imágenes/videos */
+        max-width: 90vw; /* Ajuste para tabletas */
+        max-height: 90vh; /* Ajuste para tabletas */
+    }
+    #modalMediaContainer img, #modalMediaContainer video {
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 10px 15px;
+        justify-content: center;
+    }
+    .navbar-left {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .navbar-right {
+        margin-top: 0;
+        justify-content: center;
+        gap: 15px;
+        flex-grow: 0;
+        width: 100%;
+    }
+    .galeria {
+        column-count: 2;
+        padding: 5px;
+        column-gap: 5px;
+    }
+    .imagen-item {
+        margin-bottom: 5px;
+    }
+    .modal-content-wrapper {
+        padding: 10px;
+    }
+    #modalMediaContainer {
+        width: 100%; 
+        height: 100%;
+    }
+    #modalMediaContainer img, #modalMediaContainer video {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .close-button {
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+    }
+    .about-modal-content-wrapper {
+        padding: 20px; 
+        max-width: 95%;
+    }
+    .about-photo-container {
+        width: 100%;
+        max-width: 250px;
+    }
+    .about-text-content h2, .about-text-content p {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .galeria {
+        column-count: 1;
+    }
+    .about-modal-content-wrapper {
+        gap: 15px;
+    }
+}
+
+.modal-content {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
