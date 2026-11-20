@@ -6,7 +6,7 @@
   <title>MIDMUT — AI Art by Santiago Mut</title>
   <meta name="description" content="Imágenes y videos creados con inteligencia artificial por Santiago Mut, Director Creativo."/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="estilos_finales_definitivo.css?v=3" />
+  <link rel="stylesheet" href="estilos_finales_definitivo.css?v=4" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
@@ -57,14 +57,15 @@
         <div class="about-text-content">
           <h2>Sobre mi</h2>
           <p>Este no es un portfolio. Es un mood. Una ventana a lo que hay en mi cabeza, una colección en constante mutación. Ideas, obsesiones, experimentos. Acá vas a ver retratos de personas que no existen, mundos que nadie pidió, esteticas buscadas y alegres accidentes. No hay un hilo conductor —hay una energía. Bienvenid@s a un hermoso caos.</p>
-          <p>Soy Santiago, Director Creativo con más de 12 años de carrera en agencias de publicidad y esta es mi nueva forma de crear usando herramientas de IA.<br/>Porque al final, todo es un prompt.</p>
+          <p>Soy Santiago, Director Creativo con más de 12 años de carrera en agencias de publicidad y esta es mi nueva forma de crear usando herramientas de IA.</p>
+          <p>Mi proceso tiene más de dirección de arte que de escritura: muchas veces arranco con una sola palabra, muevo parámetros y me quedo con lo que aparece. Lo que ves acá es eso: exploración y curaduría.<br/>Porque al final, todo es un prompt.</p>
         </div>
       </div>
     </div>
   </div>
 
   <script src="media_manifest.js?v=1"></script>
-  <script src="gallery_data_restaurado.js"></script>
+  <script src="contenido.js?v=1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
     const galleryEl           = document.querySelector('.galeria');
@@ -79,8 +80,8 @@
     const nextBtn             = document.getElementById('nextImageBtn');
     let currentIndex = 0;
 
-    // 0) Copia mutable de galleryImages
-    let items = galleryImages.slice();
+    // 0) Copia mutable del contenido (contenido.js)
+    let items = PIECES.slice();
 
     // 1) Orden de mayor a menor segun numero en el filename
     items.sort((a, b) => {
@@ -91,7 +92,9 @@
     // 3) Inyectar items
     //    Grilla: miniaturas livianas (imagenes/thumbs) y, para videos, poster + preview corto.
     //    El aspect-ratio viene del manifest, asi la grilla no salta mientras carga.
-    const isPlaceholderPrompt = p => !p || /^Prompt: Detalles de la creaci/.test(p);
+    const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const seriesName = key => (key && SERIES[key]) ? SERIES[key].name : 'Exploración';
+    const altText = p => `${p.type === 'video' ? 'Video' : 'Imagen'} · ${seriesName(p.series)} · ${p.tool}`;
     const baseName = fn => fn.replace(/\.[^.]+$/, '');
 
     items.forEach((img, idx) => {
@@ -106,7 +109,7 @@
              muted loop playsinline preload="none"
              class="gallery-media"></video>`
         : `<img src="imagenes/thumbs/${base}.webp"
-             alt="${img.title}" loading="${eager}" decoding="async"
+             alt="${esc(altText(img))}" loading="${eager}" decoding="async"
              ${dims ? `width="${dims.w}" height="${dims.h}"` : ''}
              class="gallery-media"/>`;
 
@@ -114,10 +117,10 @@
 
       galleryEl.insertAdjacentHTML('beforeend', `
         <div class="imagen-item" data-index="${idx}" data-type="${img.type}" ${ratio}
-             role="button" tabindex="0" aria-label="Ver ${img.title}">
+             role="button" tabindex="0" aria-label="Ver ${esc(altText(img))}">
           ${mediaTag}
           ${videoIcon}
-          <span class="item-model-badge">${img.model}</span>
+          <span class="item-model-badge">${esc(img.tool)}</span>
         </div>`);
     });
 
@@ -175,21 +178,40 @@
           })
         : Object.assign(document.createElement('img'), {
             src: `imagenes/${data.filename}`,
-            alt: data.title
+            alt: altText(data)
           });
       el.classList.add('modal-content');
       modalMediaContainer.appendChild(el);
 
+      const row = (label, value) => value ? `<div class="info-row"><span>${label}</span><span>${esc(value)}</span></div>` : '';
       modalInfoContainer.innerHTML = `
         <div class="modal-info-card">
           <div class="info-header">
-            <span class="modal-model-badge">${data.model}</span>
+            <span class="info-eyebrow">${esc(seriesName(data.series))}</span>
+            <span class="modal-model-badge">${esc(data.tool)}</span>
           </div>
           <div class="info-body">
-            ${isPlaceholderPrompt(data.prompt) ? '' : `<p class="info-prompt">${data.prompt}</p>`}
-            <div class="info-row"><span>Tipo</span><span>${data.type === 'video' ? 'Video' : 'Imagen'}</span></div>
+            ${data.note ? `<p class="info-note">${esc(data.note)}</p>` : ''}
+            <div class="info-rows">
+              ${row('Año', data.year)}
+              ${row('Formato', data.type === 'video' ? 'Video' : 'Imagen')}
+            </div>
+            ${data.prompt ? `
+            <div class="info-prompt-block">
+              <div class="info-prompt-head">
+                <span>Prompt</span>
+                <button type="button" class="copy-prompt-btn">Copiar prompt</button>
+              </div>
+              <p class="info-prompt">${esc(data.prompt)}</p>
+            </div>` : ''}
           </div>
         </div>`;
+      const copyBtn = modalInfoContainer.querySelector('.copy-prompt-btn');
+      if (copyBtn) copyBtn.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(data.prompt); copyBtn.textContent = 'Copiado ✓'; }
+        catch { copyBtn.textContent = 'No se pudo copiar'; }
+        setTimeout(() => { copyBtn.textContent = 'Copiar prompt'; }, 1800);
+      });
 
       const vis = visibleIndexes();
       const pos = vis.indexOf(idx);

@@ -522,3 +522,54 @@ footer {
     .imagen-item, .imagen-item img, .imagen-item video { transition: none; }
     .imagen-item::before { animation: none; }
 }
+
+/* ── Ficha de la pieza ── */
+.modal-info-card .info-header { justify-content: space-between; gap: 12px; }
+.info-eyebrow {
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #111;
+}
+.modal-model-badge { margin-bottom: 0; }
+.info-note {
+    margin: 0;
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #222;
+}
+.info-rows .info-row:first-child { border-top: none; padding-top: 0; }
+.info-rows .info-row { padding: 10px 0 0; margin-top: 10px; }
+.info-prompt-block {
+    background: #f7f7f7;
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+.info-prompt-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.info-prompt-head span {
+    font-size: 0.75em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #999;
+}
+.copy-prompt-btn {
+    font-family: inherit;
+    font-size: 0.78em;
+    font-weight: 600;
+    color: #fff;
+    background: #111;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.copy-prompt-btn:hover { background: #333; }
+.modal-info-card .info-prompt { max-height: 220px; }
