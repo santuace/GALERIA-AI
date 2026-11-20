@@ -43,6 +43,13 @@ def run(*args):
     subprocess.run([FF, "-hide_banner", "-loglevel", "error", "-y", *args], check=True)
 
 
+def avg_color(path):
+    """Color promedio, se usa de fondo mientras la pieza carga."""
+    with Image.open(path) as im:
+        r, g, b = im.convert("RGB").resize((1, 1), Image.BOX).getpixel((0, 0))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
 def stale(src, dst):
     return FORCE or not os.path.exists(dst) or os.path.getmtime(dst) < os.path.getmtime(src)
 
@@ -67,7 +74,7 @@ def main():
                     t = im.convert("RGB")
                     t.thumbnail((THUMB_W, THUMB_W * 4), Image.LANCZOS)
                     t.save(thumb, "WEBP", quality=78, method=6)
-            manifest[f] = {"w": w, "h": h}
+            manifest[f] = {"w": w, "h": h, "c": avg_color(thumb)}
 
         elif ext in (".mp4", ".mov", ".webm"):
             FF = FF or ffmpeg_bin()
@@ -94,7 +101,7 @@ def main():
                 os.utime(poster)
             with Image.open(poster) as im:
                 w, h = im.size
-            manifest[f] = {"w": w, "h": h}
+            manifest[f] = {"w": w, "h": h, "c": avg_color(poster)}
 
     out = os.path.join(ROOT, "media_manifest.js")
     with open(out, "w") as fh:

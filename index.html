@@ -6,34 +6,63 @@
   <title>MIDMUT — AI Art by Santiago Mut</title>
   <meta name="description" content="Imágenes y videos creados con inteligencia artificial por Santiago Mut, Director Creativo."/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="estilos_finales_definitivo.css?v=4" />
+  <link rel="stylesheet" href="estilos_finales_definitivo.css?v=7" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
 
-  <nav class="navbar">
-    <div class="navbar-left">
-      <img src="monograma.png" alt="MIDMUT" class="logo"/>
-    </div>
-    <div class="navbar-right">
-      <a href="#" id="openAboutMe" class="nav-link">Sobre mi</a>
-      <a href="https://www.linkedin.com/in/santiagomut/" class="nav-link" target="_blank">Contacto</a>
-    </div>
-  </nav>
+  <div class="layout">
+    <!-- Menú lateral -->
+    <aside class="sidebar" id="sidebar" aria-label="Secciones">
+      <a href="#/" class="sidebar-logo" aria-label="MIDMUT, inicio">
+        <img src="monograma.png" alt="" class="logo"/>
+        <span>MIDMUT</span>
+      </a>
+      <nav class="side-nav">
+        <a href="#/" class="side-link" data-section="all">Todo <span class="count"></span></a>
+        <a href="#/exploraciones" class="side-link" data-section="exploraciones">Exploraciones <span class="count"></span></a>
+        <p class="side-label">Series</p>
+        <div id="seriesNav" class="side-series"></div>
+      </nav>
+      <div class="side-bottom">
+        <a href="#" id="openAboutMe" class="side-link">Sobre mí</a>
+        <a href="https://www.linkedin.com/in/santiagomut/" class="side-link" target="_blank" rel="noopener">Contacto <span aria-hidden="true">↗</span></a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-  <div class="filter-bar">
-    <div class="filter-bar-inner">
-      <button class="filter-btn active" data-filter="all">Todo</button>
-      <button class="filter-btn" data-filter="image">Imágenes</button>
-      <button class="filter-btn" data-filter="video">Videos</button>
+    <div class="main">
+      <header class="mobile-bar">
+        <button type="button" class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <a href="#/" class="mobile-logo"><img src="monograma.png" alt="MIDMUT" class="logo"/></a>
+        <span class="mobile-bar-spacer"></span>
+      </header>
+
+      <div class="toolbar">
+        <div class="section-head">
+          <h1 id="sectionTitle">Todo</h1>
+          <p id="sectionMeta"></p>
+        </div>
+        <div class="toolbar-filters">
+          <div class="chips" id="toolChips" role="group" aria-label="Filtrar por herramienta"></div>
+          <div class="filter-bar-inner" id="formatFilter" role="group" aria-label="Filtrar por formato">
+            <button class="filter-btn active" data-format="all">Todo</button>
+            <button class="filter-btn" data-format="image">Imágenes</button>
+            <button class="filter-btn" data-format="video">Videos</button>
+          </div>
+        </div>
+      </div>
+
+      <main class="galeria"></main>
+      <p class="empty-state" id="emptyState" hidden>No hay piezas con estos filtros.</p>
+
+      <footer>
+        <p>Hecho con amor y IA por Santiago Mut</p>
+      </footer>
     </div>
   </div>
-
-  <main class="galeria"></main>
-
-  <footer>
-    <p>Hecho con amor y IA por Santiago Mut</p>
-  </footer>
 
   <!-- Modal de Imagen -->
   <div id="imageModal" class="modal">
@@ -55,8 +84,8 @@
           <img src="sobremifoto.jpeg" alt="Santiago Mut" class="about-photo"/>
         </div>
         <div class="about-text-content">
-          <h2>Sobre mi</h2>
-          <p>Este no es un portfolio. Es un mood. Una ventana a lo que hay en mi cabeza, una colección en constante mutación. Ideas, obsesiones, experimentos. Acá vas a ver retratos de personas que no existen, mundos que nadie pidió, esteticas buscadas y alegres accidentes. No hay un hilo conductor —hay una energía. Bienvenid@s a un hermoso caos.</p>
+          <h2>Sobre mí</h2>
+          <p>Este no es un portfolio. Es un mood. Una ventana a lo que hay en mi cabeza, una colección en constante mutación. Ideas, obsesiones, experimentos. Acá vas a ver retratos de personas que no existen, mundos que nadie pidió, estéticas buscadas y alegres accidentes. No hay un hilo conductor —hay una energía. Bienvenid@s a un hermoso caos.</p>
           <p>Soy Santiago, Director Creativo con más de 12 años de carrera en agencias de publicidad y esta es mi nueva forma de crear usando herramientas de IA.</p>
           <p>Mi proceso tiene más de dirección de arte que de escritura: muchas veces arranco con una sola palabra, muevo parámetros y me quedo con lo que aparece. Lo que ves acá es eso: exploración y curaduría.<br/>Porque al final, todo es un prompt.</p>
         </div>
@@ -64,8 +93,8 @@
     </div>
   </div>
 
-  <script src="media_manifest.js?v=1"></script>
-  <script src="contenido.js?v=1"></script>
+  <script src="media_manifest.js?v=2"></script>
+  <script src="contenido.js?v=2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
     const galleryEl           = document.querySelector('.galeria');
@@ -80,12 +109,19 @@
     const nextBtn             = document.getElementById('nextImageBtn');
     let currentIndex = 0;
 
+    // Al refrescar, arrancar arriba (evita el salto mientras la grilla se arma)
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+    // Medidas y color de cada archivo (media_manifest.js declara `const`, no cuelga de window)
+    const MANIFEST = typeof mediaManifest !== 'undefined' ? mediaManifest : {};
+
     // 0) Copia mutable del contenido (contenido.js)
     let items = PIECES.slice();
 
     // 1) Orden de mayor a menor segun numero en el filename
     items.sort((a, b) => {
-      const getNum = fn => +(fn.match(/\d+/) || [0])[0];
+      // imagenN / videoN por número; el resto (ej. exportaciones de Veo) al final
+      const getNum = fn => { const m = fn.match(/^(?:imagen|video)(\d+)\./); return m ? +m[1] : -1; };
       return getNum(b.filename) - getNum(a.filename);
     });
 
@@ -97,11 +133,13 @@
     const altText = p => `${p.type === 'video' ? 'Video' : 'Imagen'} · ${seriesName(p.series)} · ${p.tool}`;
     const baseName = fn => fn.replace(/\.[^.]+$/, '');
 
+    const itemsHtml = [];
     items.forEach((img, idx) => {
-      const dims  = (window.mediaManifest || {})[img.filename];
-      const ratio = dims ? `style="aspect-ratio:${dims.w}/${dims.h}"` : '';
+      const dims  = MANIFEST[img.filename];
+      const style = dims ? `style="aspect-ratio:${dims.w}/${dims.h};background:${dims.c || '#eee'}"` : '';
       const base  = baseName(img.filename);
-      const eager = idx < 8 ? 'eager' : 'lazy';
+      const eager = idx < 16 ? 'eager' : 'lazy';
+      const prio  = idx < 6 ? 'fetchpriority="high"' : '';
 
       const mediaTag = img.type === 'video'
         ? `<video data-src="imagenes/previews/${base}.mp4"
@@ -109,14 +147,14 @@
              muted loop playsinline preload="none"
              class="gallery-media"></video>`
         : `<img src="imagenes/thumbs/${base}.webp"
-             alt="${esc(altText(img))}" loading="${eager}" decoding="async"
+             alt="${esc(altText(img))}" loading="${eager}" ${prio} decoding="async"
              ${dims ? `width="${dims.w}" height="${dims.h}"` : ''}
              class="gallery-media"/>`;
 
       const videoIcon = img.type === 'video' ? `<span class="video-play-icon">▶</span>` : '';
 
-      galleryEl.insertAdjacentHTML('beforeend', `
-        <div class="imagen-item" data-index="${idx}" data-type="${img.type}" ${ratio}
+      itemsHtml.push(`
+        <div class="imagen-item" data-index="${idx}" data-type="${img.type}" ${style}
              role="button" tabindex="0" aria-label="Ver ${esc(altText(img))}">
           ${mediaTag}
           ${videoIcon}
@@ -124,16 +162,38 @@
         </div>`);
     });
 
-    // 4) Imagenes: fade-in al cargar. Videos: el poster ya se ve, se marcan listos de una.
-    document.querySelectorAll('.imagen-item').forEach(item => {
-      const media = item.querySelector('.gallery-media');
-      if (media.tagName === 'VIDEO') { item.classList.add('loaded'); return; }
-      if (media.complete && media.naturalWidth > 0) item.classList.add('loaded');
-      else {
-        media.addEventListener('load', () => item.classList.add('loaded'), { once: true });
-        media.addEventListener('error', () => item.classList.add('loaded'), { once: true });
-      }
-    });
+    // 4) Grilla tipo masonry ordenada de izquierda a derecha (como MeiGen).
+    //    Cada pieza va a la columna más corta usando su proporción conocida,
+    //    así el layout queda fijo desde el primer momento y no hay saltos.
+    const holder = document.createElement('div');
+    holder.innerHTML = itemsHtml.join('');
+    const allEls = [...holder.children];
+    const ratioOf = el => {
+      const d = MANIFEST[items[+el.dataset.index].filename];
+      return d ? d.h / d.w : 1.3;
+    };
+    let colCount = 0;
+    function columnsFor(width) {
+      if (width < 560) return 2;
+      return Math.max(2, Math.min(5, Math.round(width / 300)));
+    }
+    function layout(force) {
+      const n = columnsFor(galleryEl.clientWidth || window.innerWidth);
+      if (n === colCount && !force) return;
+      colCount = n;
+      const cols = Array.from({ length: n }, () => {
+        const c = document.createElement('div'); c.className = 'galeria-col'; return c;
+      });
+      const heights = new Array(n).fill(0);
+      allEls.forEach(el => {
+        if (el.style.display === 'none') { cols[0].appendChild(el); return; }
+        const i = heights.indexOf(Math.min(...heights));
+        cols[i].appendChild(el);
+        heights[i] += ratioOf(el) + 0.04; // + margen entre piezas
+      });
+      galleryEl.replaceChildren(...cols);
+    }
+    window.addEventListener('resize', () => layout(false));
 
     // 5) Videos de la grilla: cargan y reproducen solo cuando estan en pantalla
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -148,10 +208,10 @@
         }
       });
     }, { rootMargin: '200px' });
-    document.querySelectorAll('.imagen-item[data-type="video"]').forEach(item => videoObserver.observe(item));
+    allEls.filter(el => el.dataset.type === 'video').forEach(item => videoObserver.observe(item));
 
     // Indices visibles segun el filtro activo (para navegar el modal)
-    const visibleIndexes = () => [...document.querySelectorAll('.imagen-item')]
+    const visibleIndexes = () => allEls
       .filter(el => el.style.display !== 'none').map(el => +el.dataset.index);
     const step = dir => {
       const vis = visibleIndexes(); const pos = vis.indexOf(currentIndex);
@@ -221,7 +281,7 @@
     }
 
     // Click en miniaturas
-    document.querySelectorAll('.imagen-item').forEach(item => {
+    allEls.forEach(item => {
       item.addEventListener('click', () => openModal(+item.dataset.index));
       item.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(+item.dataset.index); }
@@ -257,21 +317,114 @@
       if (['ArrowRight','ArrowDown'].includes(e.key)) step(1);
     });
 
-    // Filtros
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.imagen-item').forEach(item => {
-          if (filter === 'all' || item.dataset.type === filter) {
-            item.style.display = '';
-          } else {
-            item.style.display = 'none';
-          }
-        });
+    // ── Secciones, series y filtros ──
+    const state = { section: 'all', tool: 'all', format: 'all' };
+    const itemEls = allEls;
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const menuBtn = document.getElementById('menuBtn');
+    const toolChips = document.getElementById('toolChips');
+    const emptyState = document.getElementById('emptyState');
+
+    const inSection = (p, section) =>
+      section === 'all' ? true : section === 'exploraciones' ? !p.series : p.series === section;
+    const countIn = section => items.filter(p => inSection(p, section)).length;
+
+    // Menú: series con su cantidad de piezas
+    document.getElementById('seriesNav').innerHTML = Object.entries(SERIES)
+      .filter(([key]) => countIn(key) > 0)
+      .map(([key, s]) => `<a href="#/serie/${key}" class="side-link" data-section="${key}">${esc(s.name)} <span class="count">${countIn(key)}</span></a>`)
+      .join('');
+    document.querySelector('[data-section="all"] .count').textContent = countIn('all');
+    document.querySelector('[data-section="exploraciones"] .count').textContent = countIn('exploraciones');
+
+    function sectionFromHash() {
+      const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+      if (h === 'exploraciones') return 'exploraciones';
+      if (h.startsWith('serie/') && SERIES[h.slice(6)]) return h.slice(6);
+      return 'all';
+    }
+
+    function render() {
+      const inSec = items.filter(p => inSection(p, state.section));
+
+      // Chips de herramienta: solo las que existen en la sección
+      const tools = {};
+      inSec.forEach(p => { if (state.format === 'all' || p.type === state.format) tools[p.tool] = (tools[p.tool] || 0) + 1; });
+      if (state.tool !== 'all' && !tools[state.tool]) state.tool = 'all';
+      const toolList = Object.entries(tools).sort((a, b) => b[1] - a[1]);
+      toolChips.innerHTML = toolList.length > 1 || state.tool !== 'all'
+        ? [['all', Object.values(tools).reduce((a, b) => a + b, 0)], ...toolList].map(([t, n]) =>
+            `<button type="button" class="chip${state.tool === t ? ' active' : ''}" data-tool="${esc(t)}" aria-pressed="${state.tool === t}">${t === 'all' ? 'Todas' : esc(t)} <span>${n}</span></button>`).join('')
+        : '';
+
+      // Formato: ocultar las opciones que no tienen piezas en la sección
+      document.querySelectorAll('#formatFilter .filter-btn').forEach(btn => {
+        const f = btn.dataset.format;
+        btn.classList.toggle('active', state.format === f);
+        btn.hidden = f !== 'all' && !inSec.some(p => p.type === f);
       });
+      const formats = new Set(inSec.map(p => p.type));
+      document.getElementById('formatFilter').hidden = formats.size < 2;
+
+      // Mostrar / ocultar piezas
+      let visible = 0;
+      itemEls.forEach(el => {
+        const p = items[+el.dataset.index];
+        const show = inSection(p, state.section)
+          && (state.tool === 'all' || p.tool === state.tool)
+          && (state.format === 'all' || p.type === state.format);
+        el.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      emptyState.hidden = visible > 0;
+      layout(true);
+      // Las primeras piezas visibles de la sección cargan ya, sin esperar al lazy-load
+      allEls.filter(el => el.style.display !== 'none').slice(0, 16)
+        .forEach(el => { const img = el.querySelector('img'); if (img) img.loading = 'eager'; });
+
+      // Encabezado de la sección
+      const title = state.section === 'all' ? 'Todo'
+        : state.section === 'exploraciones' ? 'Exploraciones' : SERIES[state.section].name;
+      const desc = state.section === 'exploraciones'
+        ? 'Pruebas sueltas, accidentes y búsquedas que no son parte de una serie.'
+        : (SERIES[state.section] && SERIES[state.section].description) || '';
+      document.getElementById('sectionTitle').textContent = title;
+      document.getElementById('sectionMeta').textContent =
+        `${visible} ${visible === 1 ? 'pieza' : 'piezas'}${desc ? ' · ' + desc : ''}`;
+      document.title = state.section === 'all' ? 'MIDMUT — AI Art by Santiago Mut' : `${title} — MIDMUT`;
+
+      document.querySelectorAll('.side-link[data-section]').forEach(a => {
+        const on = a.dataset.section === state.section;
+        a.classList.toggle('active', on);
+        if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      });
+    }
+
+    toolChips.addEventListener('click', e => {
+      const chip = e.target.closest('.chip'); if (!chip) return;
+      state.tool = chip.dataset.tool; render();
     });
+    document.getElementById('formatFilter').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn'); if (!btn) return;
+      state.format = btn.dataset.format; render();
+    });
+
+    function setMenu(open) {
+      sidebar.classList.toggle('open', open);
+      backdrop.classList.toggle('open', open);
+      menuBtn.setAttribute('aria-expanded', open);
+    }
+    menuBtn.addEventListener('click', () => setMenu(!sidebar.classList.contains('open')));
+    backdrop.addEventListener('click', () => setMenu(false));
+    sidebar.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+
+    window.addEventListener('hashchange', () => {
+      state.section = sectionFromHash(); state.tool = 'all'; state.format = 'all';
+      render(); window.scrollTo({ top: 0 });
+    });
+    state.section = sectionFromHash();
+    render();
 
     // Sobre mi
     openAboutMeBtn.addEventListener('click', e => {
