@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """
+NOTA: la galería ahora se edita en /admin, que genera todo esto al subir. Este script
+queda solo para rehacer las piezas originales; la web ya no lee media_manifest.js.
+
 Genera versiones livianas de la galería para que la web cargue rápido.
 
   imagenes/thumbs/<nombre>.webp    miniatura 640px de ancho para la grilla

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <title>Panel — MIDMUT</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+  <main id="loading" class="center"><p>Cargando…</p></main>
+
+  <main id="login" class="center" hidden>
+    <form id="loginForm" class="login-card">
+      <img src="/monograma.png" alt="" width="44"/>
+      <h1>Panel de MIDMUT</h1>
+      <input type="text" name="username" value="midmut" autocomplete="username" hidden/>
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required/>
+      <button class="btn primary" type="submit">Entrar</button>
+      <p id="loginError" class="error" role="alert"></p>
+    </form>
+  </main>
+
+  <div id="app" hidden>
+    <header class="top">
+      <div class="brand"><img src="/monograma.png" alt="" height="28"/><strong>Panel</strong></div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div class="top-actions">
+        <a class="btn ghost" href="/" target="_blank" rel="noopener">Ver web ↗</a>
+        <button class="btn ghost" id="logout" type="button">Salir</button>
+        <button class="btn" id="discard" type="button" disabled>Descartar</button>
+        <button class="btn primary" id="save" type="button" disabled>Guardar y publicar</button>
+      </div>
+    </header>
+
+    <div class="cols">
+      <nav class="side" aria-label="Secciones">
+        <div id="sections"></div>
+        <div class="side-title"><span>Series</span><button class="btn small" id="addSeries" type="button">+ Nueva</button></div>
+        <ol id="series"></ol>
+        <p class="hint">Arrastra las series para cambiar el orden del menú. Arrastra piezas sobre una serie para moverlas.</p>
+      </nav>
+
+      <section class="work">
+        <div id="seriesForm" class="series-form" hidden>
+          <label>Nombre <input id="seriesName" maxlength="80"/></label>
+          <label class="grow">Descripción <input id="seriesDesc" maxlength="600" placeholder="Se ve debajo del título de la serie"/></label>
+          <button class="btn small" id="seriesUp" type="button" aria-label="Subir serie">↑</button>
+          <button class="btn small" id="seriesDown" type="button" aria-label="Bajar serie">↓</button>
+          <button class="btn small danger" id="seriesDelete" type="button">Eliminar serie</button>
+        </div>
+
+        <label class="drop" id="drop">
+          <input type="file" id="files" multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"/>
+          <strong>Arrastra imágenes o videos, o haz clic para elegirlos</strong>
+          <span id="dropHint"></span>
+        </label>
+        <ul id="uploads" class="uploads"></ul>
+
+        <div class="bar">
+          <h2 id="title"></h2>
+          <span id="count" class="muted"></span>
+          <span class="spacer"></span>
+          <button class="btn small" id="selectAll" type="button">Seleccionar todo</button>
+          <button class="btn small" id="selectNone" type="button" hidden>Quitar selección</button>
+        </div>
+        <div id="grid" class="grid"></div>
+        <p id="empty" class="empty" hidden>No hay piezas acá. Sube algo o arrastra piezas desde otra sección.</p>
+      </section>
+
+      <aside id="editor" class="editor" hidden aria-label="Editar">
+        <div class="editor-head"><h3 id="editorTitle"></h3><button class="btn small" id="closeEditor" type="button" aria-label="Cerrar">✕</button></div>
+        <div id="editorMedia" class="editor-media"></div>
+        <p id="mixedHint" class="hint" hidden>Los campos vacíos no se modifican.</p>
+        <label>Serie <select id="fSeries"></select></label>
+        <label>Herramienta <input id="fTool" list="tools" maxlength="60"/></label>
+        <datalist id="tools"></datalist>
+        <label>Año <input id="fYear" type="number" min="1990" max="2100"/></label>
+        <div id="singleFields">
+          <label>Nota <textarea id="fNote" rows="3" maxlength="2000" placeholder="Opcional"></textarea></label>
+          <label>Prompt <textarea id="fPrompt" rows="4" maxlength="8000" placeholder="Opcional. Si lo completas, aparece el botón Copiar prompt"></textarea></label>
+        </div>
+        <div class="row">
+          <button class="btn small" id="toFirst" type="button">⇤ Al principio</button>
+          <button class="btn small" id="movePrev" type="button">← Antes</button>
+          <button class="btn small" id="moveNext" type="button">Después →</button>
+          <button class="btn small" id="toLast" type="button">Al final ⇥</button>
+        </div>
+        <div class="row">
+          <button class="btn small" id="toggleHidden" type="button"></button>
+          <button class="btn small danger" id="deletePieces" type="button">Eliminar</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog id="dialog">
+    <form method="dialog">
+      <p id="dialogText"></p>
+      <input id="dialogInput" maxlength="80" hidden/>
+      <div class="row end">
+        <button class="btn" value="cancel" formnovalidate>Cancelar</button>
+        <button class="btn primary" id="dialogOk" value="ok">Aceptar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="/admin/admin.js"></script>
+</body>
+</html>

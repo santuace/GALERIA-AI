@@ -93,8 +93,9 @@
     </div>
   </div>
 
-  <script src="media_manifest.js?v=2"></script>
-  <script src="contenido.js?v=2"></script>
+  <!-- Respaldo; /api/content lo reemplaza con lo guardado en el panel /admin -->
+  <script src="contenido.js?v=3"></script>
+  <script src="/api/content"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
     const galleryEl           = document.querySelector('.galeria');
@@ -112,43 +113,33 @@
     // Al refrescar, arrancar arriba (evita el salto mientras la grilla se arma)
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
-    // Medidas y color de cada archivo (media_manifest.js declara `const`, no cuelga de window)
-    const MANIFEST = typeof mediaManifest !== 'undefined' ? mediaManifest : {};
-
-    // 0) Copia mutable del contenido (contenido.js)
-    let items = PIECES.slice();
-
-    // 1) Orden de mayor a menor segun numero en el filename
-    items.sort((a, b) => {
-      // imagenN / videoN por número; el resto (ej. exportaciones de Veo) al final
-      const getNum = fn => { const m = fn.match(/^(?:imagen|video)(\d+)\./); return m ? +m[1] : -1; };
-      return getNum(b.filename) - getNum(a.filename);
-    });
+    // 0) Contenido: piezas y series, en el orden elegido en el panel
+    const CONTENT = window.MIDMUT_CONTENT || { series: [], pieces: [] };
+    const items = CONTENT.pieces.filter(p => !p.hidden);
+    const SERIES = Object.fromEntries(CONTENT.series.map(s => [s.id, s]));
+    const own = key => Object.prototype.hasOwnProperty.call(SERIES, key);
 
     // 3) Inyectar items
     //    Grilla: miniaturas livianas (imagenes/thumbs) y, para videos, poster + preview corto.
-    //    El aspect-ratio viene del manifest, asi la grilla no salta mientras carga.
+    //    El aspect-ratio viene con cada pieza, asi la grilla no salta mientras carga.
     const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const seriesName = key => (key && SERIES[key]) ? SERIES[key].name : 'Exploración';
-    const altText = p => `${p.type === 'video' ? 'Video' : 'Imagen'} · ${seriesName(p.series)} · ${p.tool}`;
-    const baseName = fn => fn.replace(/\.[^.]+$/, '');
+    const seriesName = key => (key && own(key)) ? SERIES[key].name : 'Exploración';
+    const altText = p => [p.type === 'video' ? 'Video' : 'Imagen', seriesName(p.series), p.tool].filter(Boolean).join(' · ');
 
     const itemsHtml = [];
     items.forEach((img, idx) => {
-      const dims  = MANIFEST[img.filename];
-      const style = dims ? `style="aspect-ratio:${dims.w}/${dims.h};background:${dims.c || '#eee'}"` : '';
-      const base  = baseName(img.filename);
+      const style = `style="aspect-ratio:${+img.w}/${+img.h};background:${esc(img.color)}"`;
       const eager = idx < 16 ? 'eager' : 'lazy';
       const prio  = idx < 6 ? 'fetchpriority="high"' : '';
 
       const mediaTag = img.type === 'video'
-        ? `<video data-src="imagenes/previews/${base}.mp4"
-             poster="imagenes/posters/${base}.webp"
+        ? `<video data-src="${esc(img.preview)}"
+             poster="${esc(img.thumb)}"
              muted loop playsinline preload="none"
              class="gallery-media"></video>`
-        : `<img src="imagenes/thumbs/${base}.webp"
+        : `<img src="${esc(img.thumb)}"
              alt="${esc(altText(img))}" loading="${eager}" ${prio} decoding="async"
-             ${dims ? `width="${dims.w}" height="${dims.h}"` : ''}
+             width="${+img.w}" height="${+img.h}"
              class="gallery-media"/>`;
 
       const videoIcon = img.type === 'video' ? `<span class="video-play-icon">▶</span>` : '';
@@ -158,7 +149,7 @@
              role="button" tabindex="0" aria-label="Ver ${esc(altText(img))}">
           ${mediaTag}
           ${videoIcon}
-          <span class="item-model-badge">${esc(img.tool)}</span>
+          ${img.tool ? `<span class="item-model-badge">${esc(img.tool)}</span>` : ''}
         </div>`);
     });
 
@@ -169,8 +160,8 @@
     holder.innerHTML = itemsHtml.join('');
     const allEls = [...holder.children];
     const ratioOf = el => {
-      const d = MANIFEST[items[+el.dataset.index].filename];
-      return d ? d.h / d.w : 1.3;
+      const p = items[+el.dataset.index];
+      return p.h / p.w;
     };
     let colCount = 0;
     function columnsFor(width) {
@@ -200,6 +191,7 @@
     const videoObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         const video = entry.target.querySelector('video');
+        if (!video.dataset.src) return; // sin preview: queda el primer cuadro
         if (entry.isIntersecting) {
           if (!video.src) video.src = video.dataset.src;
           if (!reduceMotion) video.play().catch(() => {});
@@ -228,16 +220,16 @@
 
       const el = data.type === 'video'
         ? Object.assign(document.createElement('video'), {
-            src: `imagenes/${data.filename}`,
+            src: data.src,
             controls: true,
             autoplay: true,
             loop: true,
             muted: true,
             playsInline: true,
-            poster: `imagenes/posters/${baseName(data.filename)}.webp`
+            poster: data.thumb
           })
         : Object.assign(document.createElement('img'), {
-            src: `imagenes/${data.filename}`,
+            src: data.src,
             alt: altText(data)
           });
       el.classList.add('modal-content');
@@ -248,7 +240,7 @@
         <div class="modal-info-card">
           <div class="info-header">
             <span class="info-eyebrow">${esc(seriesName(data.series))}</span>
-            <span class="modal-model-badge">${esc(data.tool)}</span>
+            ${data.tool ? `<span class="modal-model-badge">${esc(data.tool)}</span>` : ''}
           </div>
           <div class="info-body">
             ${data.note ? `<p class="info-note">${esc(data.note)}</p>` : ''}
@@ -331,9 +323,9 @@
     const countIn = section => items.filter(p => inSection(p, section)).length;
 
     // Menú: series con su cantidad de piezas
-    document.getElementById('seriesNav').innerHTML = Object.entries(SERIES)
-      .filter(([key]) => countIn(key) > 0)
-      .map(([key, s]) => `<a href="#/serie/${key}" class="side-link" data-section="${key}">${esc(s.name)} <span class="count">${countIn(key)}</span></a>`)
+    document.getElementById('seriesNav').innerHTML = CONTENT.series
+      .filter(s => countIn(s.id) > 0)
+      .map(({ id: key, ...s }) => `<a href="#/serie/${key}" class="side-link" data-section="${key}">${esc(s.name)} <span class="count">${countIn(key)}</span></a>`)
       .join('');
     document.querySelector('[data-section="all"] .count').textContent = countIn('all');
     document.querySelector('[data-section="exploraciones"] .count').textContent = countIn('exploraciones');
@@ -341,7 +333,7 @@
     function sectionFromHash() {
       const h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
       if (h === 'exploraciones') return 'exploraciones';
-      if (h.startsWith('serie/') && SERIES[h.slice(6)]) return h.slice(6);
+      if (h.startsWith('serie/') && own(h.slice(6))) return h.slice(6);
       return 'all';
     }
 
@@ -350,7 +342,7 @@
 
       // Chips de herramienta: solo las que existen en la sección
       const tools = {};
-      inSec.forEach(p => { if (state.format === 'all' || p.type === state.format) tools[p.tool] = (tools[p.tool] || 0) + 1; });
+      inSec.forEach(p => { if (p.tool && (state.format === 'all' || p.type === state.format)) tools[p.tool] = (tools[p.tool] || 0) + 1; });
       if (state.tool !== 'all' && !tools[state.tool]) state.tool = 'all';
       const toolList = Object.entries(tools).sort((a, b) => b[1] - a[1]);
       toolChips.innerHTML = toolList.length > 1 || state.tool !== 'all'
